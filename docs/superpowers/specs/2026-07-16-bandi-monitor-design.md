@@ -198,6 +198,11 @@ Inviata solo se il job trova ≥1 bando nuovo (mai visto prima) e non scartato. 
 
 Destinatario: panto75@gmail.com (configurabile).
 
+Nota tecnica: il mittente di default di Resend (`onboarding@resend.dev`, nessun dominio
+da verificare) può inviare solo all'indirizzo email del titolare dell'account Resend.
+Dato che il destinatario coincide con l'account Resend stesso, non serve verificare un
+dominio personalizzato per questo progetto.
+
 ## Dashboard
 
 React + TypeScript + Vite, componenti MUI (Material 3), build statica pubblicata su
@@ -216,6 +221,9 @@ GitHub Pages via Actions ad ogni push su main.
   Nessuna registrazione pubblica: un solo utente, creato manualmente in fase di setup.
   Row Level Security: lettura e modifica `stato` solo per utenti autenticati; inserimento
   nuovi bandi solo dal job (chiave privilegiata `service_role`, mai esposta al browser).
+  Nota tecnica: l'URL della dashboard pubblicata (GitHub Pages) va registrato come
+  redirect URL autorizzato nelle impostazioni di Supabase Auth, altrimenti il magic link
+  non reindirizza correttamente — passaggio incluso nella guida di deploy.
 
 ## Configurazione editabile dall'utente (senza scrivere codice)
 
