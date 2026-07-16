@@ -5,7 +5,7 @@
     { "id": "europa-creativa-media", "nome": "Europa Creativa MEDIA", "url": "https://www.europacreativa-media.it", "scraperModule": "europa-creativa-media", "attivo": false },
     { "id": "incentivi-gov", "nome": "incentivi.gov.it", "url": "https://www.incentivi.gov.it", "scraperModule": "incentivi-gov", "attivo": true },
     { "id": "invitalia", "nome": "Invitalia", "url": "https://www.invitalia.it", "scraperModule": "invitalia", "attivo": true },
-    { "id": "regione-lombardia", "nome": "Bandi e Servizi Regione Lombardia", "url": "https://bandi.regione.lombardia.it", "scraperModule": "regione-lombardia", "attivo": false },
+    { "id": "regione-lombardia", "nome": "Bandi e Servizi Regione Lombardia", "url": "https://bandi.regione.lombardia.it", "scraperModule": "regione-lombardia", "attivo": true },
     { "id": "fondazione-cariplo", "nome": "Fondazione Cariplo", "url": "https://www.fondazionecariplo.it/contributi/bandi/", "scraperModule": "fondazione-cariplo", "attivo": false },
     { "id": "slot-personalizzato", "nome": "Nuova fonte (da configurare)", "url": "", "scraperModule": "", "attivo": false }
   ]
