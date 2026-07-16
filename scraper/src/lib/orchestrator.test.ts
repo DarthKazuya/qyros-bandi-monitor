@@ -87,4 +87,26 @@ describe('eseguiRaccolta', () => {
 
     expect(stato.ultimoEsito).toEqual({ fontiOk: ['fonte-test'], fontiFallite: [], nuoviBandi: 1 });
   });
+
+  it('aggiorna un bando esistente con contenuto diverso e non lo segnala come nuovo match', async () => {
+    const stato = creaDbPortFake();
+    const bandoOriginal = creaBando();
+    const scraper1: Scraper = { id: 'fonte-test', scrape: async () => [bandoOriginal] };
+
+    // Prima esecuzione: salva il bando
+    await eseguiRaccolta([scraper1], keywords, stato.db);
+
+    // Seconda esecuzione: stesso bando ma con contenuto diverso (titolo diverso = hash diverso)
+    const bandoAggiornato = creaBando({
+      titolo: 'Bando gaming 2027 - NEW TITLE',
+      descrizione: 'Descrizione aggiornata',
+    });
+    const scraper2: Scraper = { id: 'fonte-test', scrape: async () => [bandoAggiornato] };
+
+    const risultatoUpdate = await eseguiRaccolta([scraper2], keywords, stato.db);
+
+    expect(stato.aggiornati).toHaveLength(1);
+    expect(stato.aggiornati[0].titolo).toBe('Bando gaming 2027 - NEW TITLE');
+    expect(risultatoUpdate.nuoviBandiRilevanti).toHaveLength(0);
+  });
 });
