@@ -1,0 +1,12 @@
+{
+  "fonti": [
+    { "id": "eit", "nome": "EIT - Bandi e gare", "url": "https://eit.europa.eu/work-with-us/procurement/calls", "scraperModule": "eit", "attivo": true },
+    { "id": "eu-portal", "nome": "EU Funding & Tenders Portal", "url": "https://ec.europa.eu/info/funding-tenders/opportunities/portal", "scraperModule": "eu-portal", "attivo": false },
+    { "id": "europa-creativa-media", "nome": "Europa Creativa MEDIA", "url": "https://www.europacreativa-media.it", "scraperModule": "europa-creativa-media", "attivo": false },
+    { "id": "incentivi-gov", "nome": "incentivi.gov.it", "url": "https://www.incentivi.gov.it", "scraperModule": "incentivi-gov", "attivo": false },
+    { "id": "invitalia", "nome": "Invitalia", "url": "https://www.invitalia.it", "scraperModule": "invitalia", "attivo": false },
+    { "id": "regione-lombardia", "nome": "Bandi e Servizi Regione Lombardia", "url": "https://bandi.regione.lombardia.it", "scraperModule": "regione-lombardia", "attivo": false },
+    { "id": "fondazione-cariplo", "nome": "Fondazione Cariplo", "url": "https://www.fondazionecariplo.it/contributi/bandi/", "scraperModule": "fondazione-cariplo", "attivo": false },
+    { "id": "slot-personalizzato", "nome": "Nuova fonte (da configurare)", "url": "", "scraperModule": "", "attivo": false }
+  ]
+}
