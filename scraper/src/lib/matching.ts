@@ -3,7 +3,7 @@ import type { Keywords, MatchResult } from './types.js';
 export function normalizzaTesto(testo: string): string {
   return testo
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[-\s]+/g, '');
 }
