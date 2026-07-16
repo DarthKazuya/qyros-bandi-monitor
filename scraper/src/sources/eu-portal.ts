@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import FormData from 'form-data';
 import { calcolaHash } from '../lib/hash.js';
 import type { BandoRaw, Scraper } from '../lib/types.js';
 
@@ -8,8 +9,8 @@ const SEARCH_URL = 'https://api.tech.ec.europa.eu/search-api/prod/rest/search?ap
 export type FetchApi = () => Promise<string>;
 
 async function fetchApiReale(): Promise<string> {
-  const params = new URLSearchParams();
-  params.append(
+  const form = new FormData();
+  form.append(
     'query',
     JSON.stringify({
       bool: {
@@ -20,18 +21,18 @@ async function fetchApiReale(): Promise<string> {
           { terms: { language: ['en'] } },
         ],
       },
-    })
+    }),
+    { contentType: 'application/json' }
   );
-  params.append('languages', JSON.stringify(['en']));
-  params.append('sort', JSON.stringify({ order: 'DESC', field: 'startDate' }));
-  params.append(
+  form.append('languages', JSON.stringify(['en']), { contentType: 'application/json' });
+  form.append('sort', JSON.stringify({ order: 'DESC', field: 'startDate' }), { contentType: 'application/json' });
+  form.append(
     'displayFields',
-    JSON.stringify(['title', 'identifier', 'status', 'startDate', 'deadlineDate', 'deadlineModel', 'descriptionByte'])
+    JSON.stringify(['title', 'identifier', 'status', 'startDate', 'deadlineDate', 'deadlineModel', 'descriptionByte']),
+    { contentType: 'application/json' }
   );
 
-  const { data } = await axios.post(SEARCH_URL, params, {
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  });
+  const { data } = await axios.post(SEARCH_URL, form, { headers: form.getHeaders() });
   return typeof data === 'string' ? data : JSON.stringify(data);
 }
 
