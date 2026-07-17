@@ -53,6 +53,8 @@ export function LoginScreen() {
                 onChange={(e) => setEmail(e.target.value)}
                 fullWidth
                 autoFocus
+                required
+                InputLabelProps={{ required: false }}
                 sx={{ mb: 2 }}
               />
               {errore && (
