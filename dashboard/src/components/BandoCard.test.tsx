@@ -1,0 +1,70 @@
+import { describe, expect, it, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { BandoCard } from './BandoCard';
+import type { Bando } from '../lib/types';
+
+function creaBando(overrides: Partial<Bando> = {}): Bando {
+  return {
+    id: '1',
+    fonte: 'eit',
+    titolo: 'Bando di test',
+    descrizione: 'Descrizione',
+    url: 'https://esempio.it/bando-test',
+    scadenza: '2026-12-31',
+    data_pubblicazione: null,
+    priorita: 'alta',
+    stato: 'nuovo',
+    ...overrides,
+  };
+}
+
+describe('BandoCard', () => {
+  it('mostra il badge "Match diretto" per priorita alta', () => {
+    render(<BandoCard bando={creaBando({ priorita: 'alta' })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('Match diretto')).toBeInTheDocument();
+  });
+
+  it('mostra il badge "Da verificare" per priorita da_verificare', () => {
+    render(<BandoCard bando={creaBando({ priorita: 'da_verificare' })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('Da verificare')).toBeInTheDocument();
+  });
+
+  it('mostra titolo, fonte e scadenza formattata in italiano', () => {
+    render(<BandoCard bando={creaBando({ titolo: 'Bando gaming 2026', fonte: 'eit', scadenza: '2026-12-31' })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('Bando gaming 2026')).toBeInTheDocument();
+    expect(screen.getByText(/eit/)).toBeInTheDocument();
+    expect(screen.getByText(/31\/12\/2026/)).toBeInTheDocument();
+  });
+
+  it('non mostra la scadenza quando è null', () => {
+    render(<BandoCard bando={creaBando({ scadenza: null })} onCambiaStato={vi.fn()} />);
+    expect(screen.queryByText(/scadenza/i)).not.toBeInTheDocument();
+  });
+
+  it('mostra un link al bando che apre in una nuova scheda', () => {
+    render(<BandoCard bando={creaBando({ url: 'https://esempio.it/bando-test' })} onCambiaStato={vi.fn()} />);
+    const link = screen.getByRole('link', { name: /vai al bando/i });
+    expect(link).toHaveAttribute('href', 'https://esempio.it/bando-test');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('rel', expect.stringContaining('noopener'));
+  });
+
+  it('chiama onCambiaStato con "visto" quando si clicca su un bando nuovo', async () => {
+    const utente = userEvent.setup();
+    const onCambiaStato = vi.fn();
+    render(<BandoCard bando={creaBando({ id: '1', stato: 'nuovo' })} onCambiaStato={onCambiaStato} />);
+
+    await utente.click(screen.getByRole('button', { name: /segna come visto/i }));
+    expect(onCambiaStato).toHaveBeenCalledWith('1', 'visto');
+  });
+
+  it('chiama onCambiaStato con "nuovo" quando si clicca su un bando già visto', async () => {
+    const utente = userEvent.setup();
+    const onCambiaStato = vi.fn();
+    render(<BandoCard bando={creaBando({ id: '1', stato: 'visto' })} onCambiaStato={onCambiaStato} />);
+
+    await utente.click(screen.getByRole('button', { name: /segna come nuovo/i }));
+    expect(onCambiaStato).toHaveBeenCalledWith('1', 'nuovo');
+  });
+});
