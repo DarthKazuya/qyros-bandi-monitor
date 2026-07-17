@@ -33,3 +33,32 @@ export const FIXTURE_DETTAGLIO_SENZA_SCADENZA = `
 </div>
 </body></html>
 `;
+
+export const FIXTURE_LISTA_PAGINA1_DI_2 = `
+<html><body>
+<div class="pager">Pagina 1 di 2</div>
+<article class="card--incentivi">
+  <h3><a class="card-unified__title" href="/incentivi-e-strumenti/incentivo-pagina-1">Incentivo di pagina uno</a></h3>
+</article>
+</body></html>
+`;
+
+export const FIXTURE_LISTA_PAGINA2 = `
+<html><body>
+<div class="pager">Pagina 2 di 2</div>
+<article class="card--incentivi">
+  <h3><a class="card-unified__title" href="/incentivi-e-strumenti/incentivo-pagina-2">Incentivo di pagina due</a></h3>
+</article>
+</body></html>
+`;
+
+export const FIXTURE_DETTAGLIO_GENERICO = `
+<html><body>
+<h1 class="title">Incentivo generico</h1>
+<p class="subtitle">Descrizione generica</p>
+<div class="pagetabctabox">
+  <h3>Data apertura</h3>
+  <p>1/1/2026</p>
+</div>
+</body></html>
+`;
