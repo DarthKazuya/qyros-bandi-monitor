@@ -28,6 +28,15 @@ export async function inviaEmailReale(opzioni: { a: string; oggetto: string; htm
   );
 }
 
+function escapeHtml(testo: string): string {
+  return testo
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function formattaBadgePriorita(priorita: Priorita): string {
   if (priorita === 'alta') {
     return '<span style="background:#ff6500;color:#fff;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;">Match diretto</span>';
@@ -42,8 +51,8 @@ export function formattaEmailDigest(nuoviBandi: NuovoBandoTrovato[], fontiFallit
       <tr>
         <td style="padding:12px 0;border-bottom:1px solid #eee;">
           <div>${formattaBadgePriorita(priorita)}</div>
-          <div style="font-weight:600;margin-top:6px;"><a href="${bando.url}" style="color:#040a1b;text-decoration:none;">${bando.titolo}</a></div>
-          <div style="color:#666;font-size:13px;margin-top:4px;">${bando.fonte}${bando.scadenza ? ` &middot; scadenza ${bando.scadenza}` : ''}</div>
+          <div style="font-weight:600;margin-top:6px;"><a href="${escapeHtml(bando.url)}" style="color:#040a1b;text-decoration:none;">${escapeHtml(bando.titolo)}</a></div>
+          <div style="color:#666;font-size:13px;margin-top:4px;">${escapeHtml(bando.fonte)}${bando.scadenza ? ` &middot; scadenza ${escapeHtml(bando.scadenza)}` : ''}</div>
         </td>
       </tr>`
     )
@@ -52,7 +61,7 @@ export function formattaEmailDigest(nuoviBandi: NuovoBandoTrovato[], fontiFallit
   const sezioneErrori =
     fontiFallite.length > 0
       ? `<p style="margin-top:24px;color:#b00020;">Attenzione, fonti non raggiungibili oggi: ${fontiFallite
-          .map((f) => f.fonte)
+          .map((f) => escapeHtml(f.fonte))
           .join(', ')}</p>`
       : '';
 

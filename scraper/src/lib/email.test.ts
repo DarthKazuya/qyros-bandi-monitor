@@ -48,4 +48,33 @@ describe('formattaEmailDigest', () => {
     const html = formattaEmailDigest([{ bando: creaBando(), priorita: 'alta' }], []);
     expect(html).not.toContain('non raggiungibili');
   });
+
+  it('non mostra alcuna scadenza (ne "null" ne "undefined") quando scadenza e null', () => {
+    const html = formattaEmailDigest([{ bando: creaBando({ scadenza: null }), priorita: 'alta' }], []);
+    expect(html).not.toContain('scadenza null');
+    expect(html).not.toContain('scadenza undefined');
+  });
+
+  it('applica escape HTML a titolo, fonte, url e nomi delle fonti fallite, per non rompere la struttura della email', () => {
+    const html = formattaEmailDigest(
+      [
+        {
+          bando: creaBando({
+            titolo: 'Bando <script>alert(1)</script> & "citazioni"',
+            fonte: 'Fonte & Co.',
+            url: 'https://esempio.it/bando?a=1&b="test"',
+          }),
+          priorita: 'alta',
+        },
+      ],
+      [{ fonte: 'Fonte <chiusa>', errore: 'timeout' }]
+    );
+
+    expect(html).not.toContain('<script>');
+    expect(html).toContain('&lt;script&gt;');
+    expect(html).toContain('&amp;');
+    expect(html).toContain('&quot;citazioni&quot;');
+    expect(html).not.toContain('Fonte <chiusa>');
+    expect(html).toContain('Fonte &lt;chiusa&gt;');
+  });
 });
