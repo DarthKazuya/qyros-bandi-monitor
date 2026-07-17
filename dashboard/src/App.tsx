@@ -7,13 +7,8 @@ import { useAuth } from './hooks/useAuth';
 import { LoginScreen } from './components/LoginScreen';
 import { ListaBandi } from './components/ListaBandi';
 
-function rilevaPreferenzaSistema(): 'light' | 'dark' {
-  if (typeof window === 'undefined' || !window.matchMedia) return 'dark';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
 function App() {
-  const [modalita, setModalita] = useState<'light' | 'dark'>(rilevaPreferenzaSistema);
+  const [modalita, setModalita] = useState<'light' | 'dark'>('dark');
   const tema = useMemo(() => creaTemaQyros(modalita), [modalita]);
   const { sessione, caricamento } = useAuth();
 
