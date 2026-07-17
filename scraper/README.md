@@ -9,17 +9,42 @@
 - `npx tsx src/index.ts --force` — esegue la pipeline reale ignorando l'orario configurato (utile per test manuali)
 - `npx tsx src/dev/dry-run-eit.ts` — esegue solo lo scraper EIT contro il sito reale e stampa i risultati
 
-## Stato Fase 1
+## Stato Fase 2
 
-Fondamenta complete: tipi condivisi, motore di matching a due livelli, hash contenuto,
-gestione orario Europe/Rome, deduplica, orchestratore con isolamento errori per fonte,
-primo scraper reale (EIT) verificato contro il sito live.
+7 fonti su 8 attive e verificate contro dati reali: EIT, EU Funding & Tenders Portal
+(API SEDIA), incentivi.gov.it (endpoint Solr), Invitalia, Bandi e Servizi Regione
+Lombardia, Europa Creativa MEDIA, Fondazione Cariplo (unica fonte che richiede un
+browser headless via Playwright, per via di una protezione Cloudflare).
+
+L'ottavo slot (`slot-personalizzato` in `config/sources.json`) resta disattivato,
+pronto per una fonte futura da configurare senza toccare il codice esistente.
 
 Il salvataggio su database e l'invio email non sono ancora collegati a servizi reali
-(Fase 1 usa una implementazione "console" del DbPort a scopo dimostrativo). Il vero
+(la pipeline usa una implementazione "console" del DbPort a scopo dimostrativo). Il vero
 adattatore Supabase e l'invio email via Resend arrivano in Fase 3, quando gli account
 saranno stati creati.
 
-Le restanti 7 fonti (EU Portal, Europa Creativa MEDIA, incentivi.gov.it, Invitalia,
-Regione Lombardia, Fondazione Cariplo, e l'ottavo slot personalizzabile) vengono
-implementate una alla volta in Fase 2, seguendo lo stesso pattern di `src/sources/eit.ts`.
+### Limiti noti
+
+- **Regione Lombardia**: vengono lette solo le prime 15 pagine dell'elenco (~90 bandi
+  più recenti), non l'intero catalogo storico (centinaia di pagine).
+- **EU Portal**: per i bandi con più scadenze (multi-cutoff) viene usata solo la prima.
+- **Fondazione Cariplo**: usa un browser reale in modalità "normale" (non headless) —
+  necessario perché Cloudflare blocca specificamente la modalità headless su questo
+  sito. In Fase 3, l'esecuzione su GitHub Actions richiederà un display virtuale
+  (es. `xvfb-run`), da configurare nel workflow. Aggiunge inoltre qualche minuto al
+  job giornaliero per via della navigazione reale pagina per pagina.
+- **Primo avvio**: la prima esecuzione con tutte e 7 le fonti attive ha trovato 845
+  bandi "nuovi" (perché nel database non c'era ancora nulla con cui confrontarli),
+  soprattutto grazie al volume di EU Portal e incentivi.gov.it e alle parole chiave di
+  Livello 2 volutamente ampie (tecnologia, innovazione, AI, startup). Le esecuzioni
+  successive troveranno solo le variazioni reali giorno per giorno, ma la primissima
+  email/dashboard dopo il deploy conterrà un numero elevato di voci "Da verificare" da
+  scremare manualmente — previsto, non un errore.
+
+## Comandi disponibili aggiuntivi
+
+- `npx tsx src/dev/dry-run-<fonte>.ts` — esegue un singolo scraper contro il sito/API
+  reale e stampa i risultati (es. `dry-run-eit.ts`, `dry-run-eu-portal.ts`,
+  `dry-run-incentivi-gov.ts`, `dry-run-invitalia.ts`, `dry-run-regione-lombardia.ts`,
+  `dry-run-europa-creativa-media.ts`, `dry-run-fondazione-cariplo.ts`).
