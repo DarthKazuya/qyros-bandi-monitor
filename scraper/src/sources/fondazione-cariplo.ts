@@ -60,7 +60,9 @@ async function fetchViaBrowserReale(url: string): Promise<string> {
   try {
     await pagina.goto(url, { waitUntil: 'load', timeout: 60000 });
   } catch (e) {
-    // Continua anche se il caricamento fallisce (potrebbe essere il timeout di Cloudflare)
+    // Continua anche se il caricamento fallisce (potrebbe essere il timeout della
+    // sfida Cloudflare) - logga per poter diagnosticare fallimenti parziali in CI
+    console.warn(`Navigazione a ${url} non completata entro il timeout:`, e);
   }
   // Attendi che la rete sia inattiva (la sfida JS automatica di Cloudflare fa
   // ulteriori richieste prima di reindirizzare alla pagina reale)
