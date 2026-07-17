@@ -12,6 +12,12 @@
 
 ## Stato Fase 4a
 
-App scaffolded e componenti principali (login, lista bandi, filtri, card) implementati
-e testati. Il deploy reale su GitHub Pages e la configurazione dell'autenticazione
-Supabase arrivano in Fase 4b.
+App completa (login, tema QYROS, filtri multi-fonte, ricerca, ordinamento, card bando,
+segna come visto/nuovo), tutta testata (nessuna chiamata di rete reale nei test
+automatici), verificata anche manualmente in un browser locale. Workflow di
+pubblicazione su GitHub Pages (`.github/workflows/deploy-dashboard.yml`) creato.
+
+Resta da fare (Fase 4b): impostare il segreto `SUPABASE_ANON_KEY` su GitHub, abilitare
+GitHub Pages per il repository, creare l'utente autorizzato su Supabase Auth,
+registrare l'URL della dashboard pubblicata come redirect URL autorizzato, e verificare
+l'accesso reale end-to-end.
