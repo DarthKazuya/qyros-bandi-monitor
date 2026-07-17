@@ -39,3 +39,9 @@ create policy "bandi_select_authenticated" on bandi
 
 create policy "bandi_update_stato_authenticated" on bandi
   for update to authenticated using (true) with check (true);
+
+-- Correzione: la tabella job_run_log non aveva i permessi di scrittura per
+-- il ruolo service_role (usato dal job), a differenza di bandi. Concessione
+-- esplicita, sicura da eseguire più volte.
+grant all on table public.job_run_log to service_role;
+grant all on table public.bandi to service_role;
