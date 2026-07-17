@@ -45,3 +45,12 @@ create policy "bandi_update_stato_authenticated" on bandi
 -- esplicita, sicura da eseguire più volte.
 grant all on table public.job_run_log to service_role;
 grant all on table public.bandi to service_role;
+
+-- Correzione: la tabella bandi aveva le policy RLS per il ruolo authenticated
+-- (Fase 4, dashboard) ma non i permessi di base sulla tabella — le policy RLS
+-- da sole non bastano senza una grant esplicita. Scoperto nella prima verifica
+-- reale della dashboard (Fase 4b): errore "permission denied for table bandi"
+-- al primo accesso autenticato. Concessione esplicita, sicura da eseguire più
+-- volte. Solo select/update: la dashboard non deve poter inserire o cancellare
+-- righe, quello resta compito esclusivo del job (service_role).
+grant select, update on table public.bandi to authenticated;
