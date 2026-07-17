@@ -17,21 +17,17 @@ let paginaCondivisa: Page | null = null;
 
 async function ottieniPagina(): Promise<Page> {
   if (paginaCondivisa) return paginaCondivisa;
+  // headless: false è necessario qui, non opzionale: verificato che la modalità
+  // headless di Chromium viene bloccata dalla sfida Cloudflare di questo sito
+  // (torna sempre la pagina "Just a moment..."), mentre lo stesso browser in
+  // modalità normale (nessuna manomissione di navigator.webdriver o di altri
+  // segnali di automazione) la supera regolarmente. In Fase 3, per l'esecuzione
+  // su GitHub Actions (che non ha un display), servirà un display virtuale
+  // (es. xvfb-run) per eseguire questo scraper in modalità "headed".
   browserCondiviso = await chromium.launch({
-    headless: true,
-    args: [
-      '--disable-blink-features=AutomationControlled',
-    ],
+    headless: false,
   });
-  paginaCondivisa = await browserCondiviso.newPage({
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  });
-  // Mascherare Playwright
-  await paginaCondivisa.addInitScript(() => {
-    Object.defineProperty(navigator, 'webdriver', {
-      get: () => false,
-    });
-  });
+  paginaCondivisa = await browserCondiviso.newPage();
   return paginaCondivisa;
 }
 
@@ -66,8 +62,12 @@ async function fetchViaBrowserReale(url: string): Promise<string> {
   } catch (e) {
     // Continua anche se il caricamento fallisce (potrebbe essere il timeout di Cloudflare)
   }
-  // Attendi un momento per Cloudflare Challenge da risolvere
-  await new Promise((resolve) => setTimeout(resolve, 5000));
+  // Attendi che la rete sia inattiva (la sfida JS automatica di Cloudflare fa
+  // ulteriori richieste prima di reindirizzare alla pagina reale)
+  await pagina.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {});
+  // Attesa aggiuntiva per dare tempo alla sfida Cloudflare di risolversi ed
+  // eseguire il reindirizzamento/re-render della pagina
+  await new Promise((resolve) => setTimeout(resolve, 7000));
   return pagina.content();
 }
 
