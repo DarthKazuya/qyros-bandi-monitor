@@ -29,6 +29,11 @@ saranno stati creati.
 - **Regione Lombardia**: vengono lette solo le prime 15 pagine dell'elenco (~90 bandi
   più recenti), non l'intero catalogo storico (centinaia di pagine).
 - **EU Portal**: per i bandi con più scadenze (multi-cutoff) viene usata solo la prima.
+- **Tetti di volume per chiamata**: EU Portal richiede fino a 1000 risultati per
+  chiamata, incentivi.gov.it fino a 8000, Fondazione Cariplo fino a 100 — tutti
+  ampiamente sopra i volumi reali osservati oggi (rispettivamente ~751, ~5671 prima del
+  filtro, 33), quindi nessuna perdita di dati al momento. Se una di queste fonti
+  crescesse molto oltre questi numeri in futuro, andrebbe aggiunta la paginazione.
 - **Fondazione Cariplo**: usa un browser reale in modalità "normale" (non headless) —
   necessario perché Cloudflare blocca specificamente la modalità headless su questo
   sito. In Fase 3, l'esecuzione su GitHub Actions richiederà un display virtuale
