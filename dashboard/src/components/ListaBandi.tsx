@@ -1,0 +1,94 @@
+import { useEffect, useMemo, useState } from 'react';
+import { Box, CircularProgress, Typography } from '@mui/material';
+import { supabase } from '../lib/supabase';
+import type { Bando } from '../lib/types';
+import { BandoCard } from './BandoCard';
+import { FiltriBar, type FiltriBarProps } from './FiltriBar';
+import { applicaFiltri, type FiltriStato } from '../lib/filtriBandi';
+
+const FILTRI_INIZIALI: FiltriStato = {
+  priorita: 'tutti',
+  fonti: [],
+  ricerca: '',
+  ordinamento: 'data_pubblicazione',
+};
+
+export function ListaBandi() {
+  const [bandi, setBandi] = useState<Bando[]>([]);
+  const [caricamento, setCaricamento] = useState(true);
+  const [errore, setErrore] = useState<string | null>(null);
+  const [filtri, setFiltri] = useState<FiltriStato>(FILTRI_INIZIALI);
+
+  useEffect(() => {
+    caricaBandi();
+  }, []);
+
+  async function caricaBandi() {
+    setCaricamento(true);
+    const { data, error } = await supabase
+      .from('bandi')
+      .select('id, fonte, titolo, descrizione, url, scadenza, data_pubblicazione, priorita, stato')
+      .eq('scartato', false)
+      .order('data_pubblicazione', { ascending: false });
+
+    if (error) {
+      setErrore(error.message);
+    } else {
+      setBandi((data ?? []) as Bando[]);
+    }
+    setCaricamento(false);
+  }
+
+  async function cambiaStato(id: string, nuovoStato: 'visto' | 'nuovo') {
+    setBandi((precedenti) => precedenti.map((b) => (b.id === id ? { ...b, stato: nuovoStato } : b)));
+    const { error } = await supabase.from('bandi').update({ stato: nuovoStato }).eq('id', id);
+    if (error) {
+      setErrore(error.message);
+      caricaBandi();
+    }
+  }
+
+  const fontiDisponibili = useMemo(() => [...new Set(bandi.map((b) => b.fonte))].sort(), [bandi]);
+  const bandiFiltrati = useMemo(() => applicaFiltri(bandi, filtri), [bandi, filtri]);
+
+  const onCambiaFiltri: FiltriBarProps['onCambiaFiltri'] = setFiltri;
+
+  if (caricamento) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  return (
+    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 4 }}>
+      <FiltriBar filtri={filtri} fontiDisponibili={fontiDisponibili} onCambiaFiltri={onCambiaFiltri} />
+
+      {errore && (
+        <Typography color="error" sx={{ mt: 2 }}>
+          {errore}
+        </Typography>
+      )}
+
+      {bandiFiltrati.length === 0 ? (
+        <Typography color="text.secondary" sx={{ mt: 4, textAlign: 'center' }}>
+          Nessun bando trovato con questi filtri.
+        </Typography>
+      ) : (
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+            gap: 2,
+            mt: 2,
+          }}
+        >
+          {bandiFiltrati.map((bando) => (
+            <BandoCard key={bando.id} bando={bando} onCambiaStato={cambiaStato} />
+          ))}
+        </Box>
+      )}
+    </Box>
+  );
+}
