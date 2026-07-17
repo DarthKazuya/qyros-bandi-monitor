@@ -12,7 +12,10 @@ export function LoginScreen() {
     evento.preventDefault();
     setErrore(null);
     setInvioInCorso(true);
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href },
+    });
     setInvioInCorso(false);
     if (error) {
       setErrore(error.message);
