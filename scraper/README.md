@@ -53,3 +53,33 @@ saranno stati creati.
   reale e stampa i risultati (es. `dry-run-eit.ts`, `dry-run-eu-portal.ts`,
   `dry-run-incentivi-gov.ts`, `dry-run-invitalia.ts`, `dry-run-regione-lombardia.ts`,
   `dry-run-europa-creativa-media.ts`, `dry-run-fondazione-cariplo.ts`).
+
+## Stato Fase 3a
+
+Adattatore Supabase e invio email via Resend scritti e testati con dati finti
+(nessuna credenziale reale usata nei test automatici). `scraper/src/index.ts`
+seleziona automaticamente l'implementazione reale quando le variabili
+d'ambiente `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY` e
+`RESEND_API_KEY`/`NOTIFICATION_EMAIL` sono presenti, altrimenti continua a
+usare il DbPort console (nessun salvataggio reale, nessuna email) — verificato
+che questo comportamento di fallback funziona esattamente come nelle fasi
+precedenti (esecuzione reale completa: 847 bandi rilevanti trovati su 7/7
+fonti, nessuna email inviata per assenza delle credenziali).
+
+Il repository è ora ospitato su GitHub
+(`https://github.com/DarthKazuya/qyros-bandi-monitor`) e i quattro segreti
+del job (`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`,
+`NOTIFICATION_EMAIL`) sono già configurati nelle GitHub Secrets del
+repository. Resta da fare, prima che il job giornaliero funzioni per davvero:
+
+1. Eseguire una volta `supabase/schema.sql` nell'SQL Editor del progetto
+   Supabase reale (crea le tabelle `bandi` e `job_run_log`).
+2. Avviare manualmente il workflow `.github/workflows/daily-job.yml` da
+   GitHub (tab "Actions" → "Job giornaliero bandi" → "Run workflow") e
+   verificare che vada a buon fine: righe scritte su Supabase, email
+   effettivamente ricevuta.
+
+Localmente, senza le variabili d'ambiente reali impostate, `npx tsx
+src/index.ts --force` continua a funzionare esattamente come nelle fasi
+precedenti — utile per continuare a testare in locale senza toccare i dati
+reali.
