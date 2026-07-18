@@ -10,14 +10,18 @@
 - `npm run typecheck` — verifica i tipi TypeScript
 - `npm run build` — crea la build statica di produzione in `dist/`
 
-## Stato Fase 4a
+## Stato
 
-App completa (login, tema QYROS, filtri multi-fonte, ricerca, ordinamento, card bando,
-segna come visto/nuovo), tutta testata (nessuna chiamata di rete reale nei test
-automatici), verificata anche manualmente in un browser locale. Workflow di
-pubblicazione su GitHub Pages (`.github/workflows/deploy-dashboard.yml`) creato.
+Live in produzione: https://darthkazuya.github.io/qyros-bandi-monitor/ (login via
+link email, un solo utente autorizzato, registrazione pubblica disattivata).
 
-Resta da fare (Fase 4b): impostare il segreto `SUPABASE_ANON_KEY` su GitHub, abilitare
-GitHub Pages per il repository, creare l'utente autorizzato su Supabase Auth,
-registrare l'URL della dashboard pubblicata come redirect URL autorizzato, e verificare
-l'accesso reale end-to-end.
+Funzionalità: login con link via email, tema Fund Radar (scuro di default, con
+toggle chiaro/scuro), card bando con badge priorità e conto alla rovescia alla
+scadenza (colore di allarme sotto i 30 giorni), filtri per priorità (con contatori),
+fonte (sempre tutte le attive, multi-selezione), parole chiave (selezione multipla,
+intersezione — un bando deve contenerle tutte), ricerca libera, ordinamento con
+direzione invertibile, segna come visto/nuovo, filtri ricordati tra una visita e
+l'altra. Tutta testata (nessuna chiamata di rete reale nei test automatici),
+verificata anche manualmente in un browser reale con dati reali. Pubblicazione
+automatica su GitHub Pages ad ogni push su `main` che tocca `dashboard/**`
+(`.github/workflows/deploy-dashboard.yml`).
