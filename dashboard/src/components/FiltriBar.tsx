@@ -25,10 +25,11 @@ import { PAROLE_CHIAVE } from '../lib/keywords';
 export interface FiltriBarProps {
   filtri: FiltriStato;
   fontiDisponibili: string[];
+  conteggiPriorita: { tutti: number; alta: number; da_verificare: number };
   onCambiaFiltri: (filtri: FiltriStato) => void;
 }
 
-export function FiltriBar({ filtri, fontiDisponibili, onCambiaFiltri }: FiltriBarProps) {
+export function FiltriBar({ filtri, fontiDisponibili, conteggiPriorita, onCambiaFiltri }: FiltriBarProps) {
   const [paroleChiaveAperte, setParoleChiaveAperte] = useState(false);
 
   function gestisciCambioFonti(evento: SelectChangeEvent<string[]>) {
@@ -80,13 +81,13 @@ export function FiltriBar({ filtri, fontiDisponibili, onCambiaFiltri }: FiltriBa
         sx={{ flexWrap: 'wrap' }}
       >
         <ToggleButton value="tutti" sx={{ minHeight: 44 }}>
-          Tutti
+          Tutti ({conteggiPriorita.tutti})
         </ToggleButton>
         <ToggleButton value="alta" sx={{ minHeight: 44 }}>
-          Match diretto
+          Match diretto ({conteggiPriorita.alta})
         </ToggleButton>
         <ToggleButton value="da_verificare" sx={{ minHeight: 44 }}>
-          Da verificare
+          Da verificare ({conteggiPriorita.da_verificare})
         </ToggleButton>
       </ToggleButtonGroup>
 

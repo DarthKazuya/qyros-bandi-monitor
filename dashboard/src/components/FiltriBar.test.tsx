@@ -13,11 +13,20 @@ const filtriBase: FiltriStato = {
   direzioneOrdinamento: 'decrescente',
 };
 
+const conteggiEsempio = { tutti: 5, alta: 2, da_verificare: 3 };
+
 describe('FiltriBar', () => {
   it('chiama onCambiaFiltri con il testo di ricerca aggiornato', async () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
     await utente.type(screen.getByPlaceholderText(/cerca per titolo/i), 'g');
     expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, ricerca: 'g' });
@@ -26,16 +35,30 @@ describe('FiltriBar', () => {
   it('chiama onCambiaFiltri quando si seleziona "Match diretto"', async () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
-    await utente.click(screen.getByRole('button', { name: 'Match diretto' }));
+    await utente.click(screen.getByRole('button', { name: /match diretto/i }));
     expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, priorita: 'alta' });
   });
 
   it('permette di selezionare più fonti (multi-select)', async () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit', 'invitalia']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit', 'invitalia']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
     await utente.click(screen.getByLabelText('Fonte'));
     await utente.click(await screen.findByRole('option', { name: 'eit' }));
@@ -45,7 +68,14 @@ describe('FiltriBar', () => {
   it('chiama onCambiaFiltri quando si cambia ordinamento a scadenza', async () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
     await utente.click(screen.getByLabelText('Ordina per'));
     await utente.click(await screen.findByRole('option', { name: 'Scadenza' }));
@@ -54,7 +84,14 @@ describe('FiltriBar', () => {
 
   it('la sezione parole chiave è chiusa di default e si apre al tap', async () => {
     const utente = userEvent.setup();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit']} onCambiaFiltri={vi.fn()} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={vi.fn()}
+      />
+    );
 
     expect(screen.queryByRole('button', { name: 'gaming' })).not.toBeInTheDocument();
     await utente.click(screen.getByRole('button', { name: /parole chiave/i }));
@@ -64,7 +101,14 @@ describe('FiltriBar', () => {
   it('chiama onCambiaFiltri con la parola chiave selezionata', async () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
     await utente.click(screen.getByRole('button', { name: /parole chiave/i }));
     await utente.click(screen.getByRole('button', { name: 'gaming' }));
@@ -75,7 +119,14 @@ describe('FiltriBar', () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
     const filtriConParola = { ...filtriBase, paroleChiave: ['gaming'] };
-    render(<FiltriBar filtri={filtriConParola} fontiDisponibili={['eit']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriConParola}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
     await utente.click(screen.getByRole('button', { name: /parole chiave/i }));
     await utente.click(screen.getByRole('button', { name: 'gaming' }));
@@ -85,9 +136,30 @@ describe('FiltriBar', () => {
   it('chiama onCambiaFiltri con la direzione invertita quando si clicca il pulsante di direzione', async () => {
     const utente = userEvent.setup();
     const onCambiaFiltri = vi.fn();
-    render(<FiltriBar filtri={filtriBase} fontiDisponibili={['eit']} onCambiaFiltri={onCambiaFiltri} />);
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={onCambiaFiltri}
+      />
+    );
 
     await utente.click(screen.getByLabelText(/inverti direzione ordinamento/i));
     expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, direzioneOrdinamento: 'crescente' });
+  });
+
+  it('mostra i contatori sulle schede di priorità', () => {
+    render(
+      <FiltriBar
+        filtri={filtriBase}
+        fontiDisponibili={['eit']}
+        conteggiPriorita={conteggiEsempio}
+        onCambiaFiltri={vi.fn()}
+      />
+    );
+    expect(screen.getByRole('button', { name: /tutti \(5\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /match diretto \(2\)/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /da verificare \(3\)/i })).toBeInTheDocument();
   });
 });

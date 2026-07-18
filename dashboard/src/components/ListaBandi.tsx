@@ -5,19 +5,23 @@ import type { Bando } from '../lib/types';
 import { BandoCard } from './BandoCard';
 import { FiltriBar, type FiltriBarProps } from './FiltriBar';
 import { applicaFiltri, type FiltriStato } from '../lib/filtriBandi';
+import { FONTI_ATTIVE } from '../lib/sources';
+import { caricaFiltriSalvati, salvaFiltri } from '../lib/persistenzaFiltri';
 
-const FILTRI_INIZIALI: FiltriStato = {
+const FILTRI_DEFAULT: FiltriStato = {
   priorita: 'tutti',
   fonti: [],
+  paroleChiave: [],
   ricerca: '',
   ordinamento: 'data_pubblicazione',
+  direzioneOrdinamento: 'decrescente',
 };
 
 export function ListaBandi() {
   const [bandi, setBandi] = useState<Bando[]>([]);
   const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState<string | null>(null);
-  const [filtri, setFiltri] = useState<FiltriStato>(FILTRI_INIZIALI);
+  const [filtri, setFiltri] = useState<FiltriStato>(() => caricaFiltriSalvati() ?? FILTRI_DEFAULT);
 
   useEffect(() => {
     caricaBandi();
@@ -48,10 +52,21 @@ export function ListaBandi() {
     }
   }
 
-  const fontiDisponibili = useMemo(() => [...new Set(bandi.map((b) => b.fonte))].sort(), [bandi]);
   const bandiFiltrati = useMemo(() => applicaFiltri(bandi, filtri), [bandi, filtri]);
 
-  const onCambiaFiltri: FiltriBarProps['onCambiaFiltri'] = setFiltri;
+  const conteggiPriorita = useMemo(() => {
+    const senzaPriorita = applicaFiltri(bandi, { ...filtri, priorita: 'tutti' });
+    return {
+      tutti: senzaPriorita.length,
+      alta: senzaPriorita.filter((b) => b.priorita === 'alta').length,
+      da_verificare: senzaPriorita.filter((b) => b.priorita === 'da_verificare').length,
+    };
+  }, [bandi, filtri]);
+
+  const onCambiaFiltri: FiltriBarProps['onCambiaFiltri'] = (nuoviFiltri) => {
+    setFiltri(nuoviFiltri);
+    salvaFiltri(nuoviFiltri);
+  };
 
   if (caricamento) {
     return (
@@ -63,7 +78,12 @@ export function ListaBandi() {
 
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 4 }}>
-      <FiltriBar filtri={filtri} fontiDisponibili={fontiDisponibili} onCambiaFiltri={onCambiaFiltri} />
+      <FiltriBar
+        filtri={filtri}
+        fontiDisponibili={FONTI_ATTIVE}
+        conteggiPriorita={conteggiPriorita}
+        onCambiaFiltri={onCambiaFiltri}
+      />
 
       {errore && (
         <Typography color="error" sx={{ mt: 2 }}>

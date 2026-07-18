@@ -74,3 +74,50 @@ describe('ListaBandi', () => {
     await waitFor(() => expect(aggiornaFinto).toHaveBeenCalledWith({ stato: 'visto' }, 'id', '1'));
   });
 });
+
+describe('ListaBandi — fonti e persistenza', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('mostra tutte le fonti attive configurate, non solo quelle con bandi già trovati', async () => {
+    datiFinti = [creaBando({ id: '1', fonte: 'eit' })];
+    render(<ListaBandi />);
+    await waitFor(() => expect(screen.getByText('Bando A')).toBeInTheDocument());
+
+    const utente = userEvent.setup();
+    await utente.click(screen.getByLabelText('Fonte'));
+    expect(await screen.findByRole('option', { name: 'regione-lombardia' })).toBeInTheDocument();
+  });
+
+  it('ripristina i filtri salvati da una visita precedente', async () => {
+    localStorage.setItem(
+      'qyros-dashboard-filtri',
+      JSON.stringify({
+        priorita: 'alta',
+        fonti: [],
+        paroleChiave: [],
+        ricerca: '',
+        ordinamento: 'data_pubblicazione',
+        direzioneOrdinamento: 'decrescente',
+      })
+    );
+    datiFinti = [creaBando({ id: '1', titolo: 'Bando A', priorita: 'alta' }), creaBando({ id: '2', titolo: 'Bando B', priorita: 'da_verificare' })];
+
+    render(<ListaBandi />);
+    await waitFor(() => expect(screen.getByText('Bando A')).toBeInTheDocument());
+    expect(screen.queryByText('Bando B')).not.toBeInTheDocument();
+  });
+
+  it('salva i filtri quando l\'utente li cambia', async () => {
+    datiFinti = [creaBando({ id: '1', titolo: 'Bando A' })];
+    render(<ListaBandi />);
+    await waitFor(() => expect(screen.getByText('Bando A')).toBeInTheDocument());
+
+    const utente = userEvent.setup();
+    await utente.click(screen.getByRole('button', { name: /match diretto/i }));
+
+    const salvato = JSON.parse(localStorage.getItem('qyros-dashboard-filtri') ?? '{}');
+    expect(salvato.priorita).toBe('alta');
+  });
+});
