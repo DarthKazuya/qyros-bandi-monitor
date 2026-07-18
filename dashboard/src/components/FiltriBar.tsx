@@ -1,7 +1,10 @@
+import { useState } from 'react';
 import {
   Box,
-  Checkbox,
+  Chip,
+  Collapse,
   FormControl,
+  IconButton,
   InputLabel,
   ListItemText,
   MenuItem,
@@ -9,9 +12,15 @@ import {
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Typography,
+  Checkbox,
   type SelectChangeEvent,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import type { FiltriStato } from '../lib/filtriBandi';
+import { PAROLE_CHIAVE } from '../lib/keywords';
 
 export interface FiltriBarProps {
   filtri: FiltriStato;
@@ -20,9 +29,26 @@ export interface FiltriBarProps {
 }
 
 export function FiltriBar({ filtri, fontiDisponibili, onCambiaFiltri }: FiltriBarProps) {
+  const [paroleChiaveAperte, setParoleChiaveAperte] = useState(false);
+
   function gestisciCambioFonti(evento: SelectChangeEvent<string[]>) {
     const valore = evento.target.value;
     onCambiaFiltri({ ...filtri, fonti: typeof valore === 'string' ? valore.split(',') : valore });
+  }
+
+  function gestisciToggleParolaChiave(parola: string) {
+    const attiva = filtri.paroleChiave.includes(parola);
+    const nuoveParole = attiva
+      ? filtri.paroleChiave.filter((p) => p !== parola)
+      : [...filtri.paroleChiave, parola];
+    onCambiaFiltri({ ...filtri, paroleChiave: nuoveParole });
+  }
+
+  function gestisciInversioneDirezione() {
+    onCambiaFiltri({
+      ...filtri,
+      direzioneOrdinamento: filtri.direzioneOrdinamento === 'crescente' ? 'decrescente' : 'crescente',
+    });
   }
 
   return (
@@ -98,6 +124,55 @@ export function FiltriBar({ filtri, fontiDisponibili, onCambiaFiltri }: FiltriBa
             <MenuItem value="scadenza">Scadenza</MenuItem>
           </Select>
         </FormControl>
+
+        <IconButton
+          onClick={gestisciInversioneDirezione}
+          aria-label="Inverti direzione ordinamento"
+          sx={{ minWidth: 44, minHeight: 44 }}
+        >
+          {filtri.direzioneOrdinamento === 'crescente' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        </IconButton>
+      </Box>
+
+      <Box>
+        <Box
+          component="button"
+          type="button"
+          onClick={() => setParoleChiaveAperte((aperto) => !aperto)}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 0.5,
+            bgcolor: 'transparent',
+            border: 'none',
+            color: 'text.secondary',
+            cursor: 'pointer',
+            p: 1,
+            minHeight: 44,
+          }}
+        >
+          <Typography variant="body2">
+            Parole chiave{filtri.paroleChiave.length > 0 ? ` (${filtri.paroleChiave.length})` : ''}
+          </Typography>
+          <ExpandMoreIcon
+            fontSize="small"
+            sx={{ transform: paroleChiaveAperte ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }}
+          />
+        </Box>
+        <Collapse in={paroleChiaveAperte}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pt: 1 }}>
+            {PAROLE_CHIAVE.map((parola) => (
+              <Chip
+                key={parola}
+                label={parola}
+                clickable
+                onClick={() => gestisciToggleParolaChiave(parola)}
+                color={filtri.paroleChiave.includes(parola) ? 'primary' : 'default'}
+                sx={{ minHeight: 44 }}
+              />
+            ))}
+          </Box>
+        </Collapse>
       </Box>
     </Box>
   );
