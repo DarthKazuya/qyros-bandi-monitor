@@ -4,6 +4,13 @@ import userEvent from '@testing-library/user-event';
 import { BandoCard } from './BandoCard';
 import type { Bando } from '../lib/types';
 
+function dataLocaleISO(data: Date): string {
+  const anno = data.getFullYear();
+  const mese = String(data.getMonth() + 1).padStart(2, '0');
+  const giorno = String(data.getDate()).padStart(2, '0');
+  return `${anno}-${mese}-${giorno}`;
+}
+
 function creaBando(overrides: Partial<Bando> = {}): Bando {
   return {
     id: '1',
@@ -66,5 +73,29 @@ describe('BandoCard', () => {
 
     await utente.click(screen.getByRole('button', { name: /segna come nuovo/i }));
     expect(onCambiaStato).toHaveBeenCalledWith('1', 'nuovo');
+  });
+
+  it('mostra il conto alla rovescia per una scadenza futura', () => {
+    const tra20Giorni = new Date();
+    tra20Giorni.setDate(tra20Giorni.getDate() + 20);
+    const scadenza = dataLocaleISO(tra20Giorni);
+
+    render(<BandoCard bando={creaBando({ scadenza })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('20 giorni alla scadenza')).toBeInTheDocument();
+  });
+
+  it('mostra "Scaduto" per una scadenza passata', () => {
+    const ieri = new Date();
+    ieri.setDate(ieri.getDate() - 1);
+    const scadenza = dataLocaleISO(ieri);
+
+    render(<BandoCard bando={creaBando({ scadenza })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('Scaduto')).toBeInTheDocument();
+  });
+
+  it('non mostra alcun badge di conto alla rovescia quando la scadenza è null', () => {
+    render(<BandoCard bando={creaBando({ scadenza: null })} onCambiaStato={vi.fn()} />);
+    expect(screen.queryByText(/alla scadenza/i)).not.toBeInTheDocument();
+    expect(screen.queryByText('Scaduto')).not.toBeInTheDocument();
   });
 });

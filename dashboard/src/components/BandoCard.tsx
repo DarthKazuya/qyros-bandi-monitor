@@ -9,14 +9,26 @@ export interface BandoCardProps {
   onCambiaStato: (id: string, nuovoStato: 'visto' | 'nuovo') => void;
 }
 
+const MILLISECONDI_AL_GIORNO = 1000 * 60 * 60 * 24;
+const SOGLIA_GIORNI_ALLARME = 30;
+
 function formattaData(data: string): string {
   const [anno, mese, giorno] = data.split('-');
   return `${giorno}/${mese}/${anno}`;
 }
 
+function calcolaGiorniAllaScadenza(scadenza: string, oggi: Date): number {
+  const [anno, mese, giorno] = scadenza.split('-').map(Number);
+  const dataScadenza = new Date(anno, mese - 1, giorno);
+  const inizioOggi = new Date(oggi.getFullYear(), oggi.getMonth(), oggi.getDate());
+  return Math.round((dataScadenza.getTime() - inizioOggi.getTime()) / MILLISECONDI_AL_GIORNO);
+}
+
 export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
   const eVisto = bando.stato === 'visto';
   const eAlta = bando.priorita === 'alta';
+  const giorniAllaScadenza = bando.scadenza ? calcolaGiorniAllaScadenza(bando.scadenza, new Date()) : null;
+  const eInAllarme = giorniAllaScadenza !== null && giorniAllaScadenza < SOGLIA_GIORNI_ALLARME;
 
   return (
     <Card sx={{ opacity: eVisto ? 0.6 : 1, transition: 'opacity 0.2s ease', height: '100%' }}>
@@ -50,14 +62,28 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
           {bando.scadenza && ` · scadenza ${formattaData(bando.scadenza)}`}
         </Typography>
 
-        <Link
-          href={bando.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 1.5, minHeight: 44 }}
-        >
-          Vai al bando <OpenInNewIcon fontSize="small" />
-        </Link>
+        {giorniAllaScadenza !== null && (
+          <Chip
+            label={giorniAllaScadenza < 0 ? 'Scaduto' : `${giorniAllaScadenza} giorni alla scadenza`}
+            size="small"
+            sx={{
+              mt: 1,
+              bgcolor: eInAllarme ? 'error.main' : 'action.selected',
+              color: eInAllarme ? '#ffffff' : 'text.primary',
+            }}
+          />
+        )}
+
+        <Box>
+          <Link
+            href={bando.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ display: 'inline-flex', alignItems: 'center', gap: 0.5, mt: 1.5, minHeight: 44 }}
+          >
+            Vai al bando <OpenInNewIcon fontSize="small" />
+          </Link>
+        </Box>
       </CardContent>
     </Card>
   );
