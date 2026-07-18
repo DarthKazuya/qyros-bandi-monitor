@@ -1,10 +1,13 @@
 import type { Bando, Priorita } from './types';
+import { normalizzaTesto } from './normalizzaTesto';
 
 export interface FiltriStato {
   priorita: Priorita | 'tutti';
   fonti: string[];
+  paroleChiave: string[];
   ricerca: string;
   ordinamento: 'data_pubblicazione' | 'scadenza';
+  direzioneOrdinamento: 'crescente' | 'decrescente';
 }
 
 function confrontaConNullInFondo(valoreA: string | null, valoreB: string | null, ascendente: boolean): number {
@@ -25,6 +28,13 @@ export function applicaFiltri(bandi: Bando[], filtri: FiltriStato): Bando[] {
     risultato = risultato.filter((b) => filtri.fonti.includes(b.fonte));
   }
 
+  if (filtri.paroleChiave.length > 0) {
+    risultato = risultato.filter((b) => {
+      const testoNormalizzato = normalizzaTesto(`${b.titolo} ${b.descrizione}`);
+      return filtri.paroleChiave.every((parola) => testoNormalizzato.includes(normalizzaTesto(parola)));
+    });
+  }
+
   const query = filtri.ricerca.trim().toLowerCase();
   if (query !== '') {
     risultato = risultato.filter(
@@ -32,9 +42,10 @@ export function applicaFiltri(bandi: Bando[], filtri: FiltriStato): Bando[] {
     );
   }
 
+  const ascendente = filtri.direzioneOrdinamento === 'crescente';
   return [...risultato].sort((a, b) =>
     filtri.ordinamento === 'scadenza'
-      ? confrontaConNullInFondo(a.scadenza, b.scadenza, true)
-      : confrontaConNullInFondo(a.data_pubblicazione, b.data_pubblicazione, false)
+      ? confrontaConNullInFondo(a.scadenza, b.scadenza, ascendente)
+      : confrontaConNullInFondo(a.data_pubblicazione, b.data_pubblicazione, ascendente)
   );
 }

@@ -20,8 +20,10 @@ function creaBando(overrides: Partial<Bando> = {}): Bando {
 const filtriBase: FiltriStato = {
   priorita: 'tutti',
   fonti: [],
+  paroleChiave: [],
   ricerca: '',
   ordinamento: 'data_pubblicazione',
+  direzioneOrdinamento: 'decrescente',
 };
 
 describe('applicaFiltri', () => {
@@ -72,7 +74,11 @@ describe('applicaFiltri', () => {
       creaBando({ id: '2', scadenza: '2026-03-01' }),
       creaBando({ id: '3', scadenza: null }),
     ];
-    const risultato = applicaFiltri(bandi, { ...filtriBase, ordinamento: 'scadenza' });
+    const risultato = applicaFiltri(bandi, {
+      ...filtriBase,
+      ordinamento: 'scadenza',
+      direzioneOrdinamento: 'crescente',
+    });
     expect(risultato.map((b) => b.id)).toEqual(['2', '1', '3']);
   });
 
@@ -84,5 +90,61 @@ describe('applicaFiltri', () => {
     ];
     const risultato = applicaFiltri(bandi, { ...filtriBase, priorita: 'alta', fonti: ['eit'] });
     expect(risultato.map((b) => b.id)).toEqual(['1']);
+  });
+});
+
+describe('applicaFiltri — parole chiave', () => {
+  it('non filtra nulla se nessuna parola chiave è selezionata', () => {
+    const bandi = [creaBando({ id: '1', titolo: 'Bando gaming' }), creaBando({ id: '2', titolo: 'Altro bando' })];
+    expect(applicaFiltri(bandi, filtriBase).map((b) => b.id)).toEqual(['1', '2']);
+  });
+
+  it('filtra per una singola parola chiave (case/accenti/trattini insensibili)', () => {
+    const bandi = [
+      creaBando({ id: '1', titolo: 'Bando START-UP innovative' }),
+      creaBando({ id: '2', titolo: 'Bando qualsiasi' }),
+    ];
+    const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['startup'] });
+    expect(risultato.map((b) => b.id)).toEqual(['1']);
+  });
+
+  it('con più parole chiave selezionate richiede che siano tutte presenti (AND)', () => {
+    const bandi = [
+      creaBando({ id: '1', titolo: 'Bando gaming e startup insieme' }),
+      creaBando({ id: '2', titolo: 'Bando solo gaming' }),
+      creaBando({ id: '3', titolo: 'Bando solo startup' }),
+    ];
+    const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['gaming', 'startup'] });
+    expect(risultato.map((b) => b.id)).toEqual(['1']);
+  });
+
+  it('cerca anche nella descrizione, non solo nel titolo', () => {
+    const bandi = [creaBando({ id: '1', titolo: 'Bando X', descrizione: 'per il settore gaming' })];
+    const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['gaming'] });
+    expect(risultato.map((b) => b.id)).toEqual(['1']);
+  });
+});
+
+describe('applicaFiltri — direzione ordinamento', () => {
+  it('data_pubblicazione crescente mostra prima i più vecchi', () => {
+    const bandi = [
+      creaBando({ id: '1', data_pubblicazione: '2026-01-01' }),
+      creaBando({ id: '2', data_pubblicazione: '2026-03-01' }),
+    ];
+    const risultato = applicaFiltri(bandi, { ...filtriBase, direzioneOrdinamento: 'crescente' });
+    expect(risultato.map((b) => b.id)).toEqual(['1', '2']);
+  });
+
+  it('scadenza decrescente mostra prima le più lontane', () => {
+    const bandi = [
+      creaBando({ id: '1', scadenza: '2026-06-01' }),
+      creaBando({ id: '2', scadenza: '2026-03-01' }),
+    ];
+    const risultato = applicaFiltri(bandi, {
+      ...filtriBase,
+      ordinamento: 'scadenza',
+      direzioneOrdinamento: 'decrescente',
+    });
+    expect(risultato.map((b) => b.id)).toEqual(['1', '2']);
   });
 });
