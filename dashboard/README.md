@@ -21,7 +21,8 @@ scadenza (colore di allarme sotto i 30 giorni), filtri per priorità (con contat
 fonte (sempre tutte le attive, multi-selezione), parole chiave (selezione multipla,
 intersezione — un bando deve contenerle tutte), ricerca libera, ordinamento con
 direzione invertibile, segna come visto/nuovo, filtri ricordati tra una visita e
-l'altra. Tutta testata (nessuna chiamata di rete reale nei test automatici),
-verificata anche manualmente in un browser reale con dati reali. Pubblicazione
-automatica su GitHub Pages ad ogni push su `main` che tocca `dashboard/**`
-(`.github/workflows/deploy-dashboard.yml`).
+l'altra. Tutta testata (nessuna chiamata di rete reale nei test automatici), più
+un controllo di non-regressione nel browser locale (schermata di login, nessun
+errore in console) — la verifica completa con dati reali avviene dopo la
+pubblicazione. Pubblicazione automatica su GitHub Pages ad ogni push su `main`
+che tocca `dashboard/**` (`.github/workflows/deploy-dashboard.yml`).
