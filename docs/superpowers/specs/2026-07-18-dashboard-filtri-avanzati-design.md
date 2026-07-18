@@ -73,10 +73,9 @@ fase è contenuto in `dashboard/`.
   selezionato. Le direzioni di default restano quelle attuali (pubblicazione
   decrescente, scadenza crescente) finché l'utente non le inverte.
 - **Cambio di campo di ordinamento**: quando l'utente passa da "Data
-  pubblicazione" a "Scadenza" (o viceversa), la direzione torna al valore di
-  default di quel campo, invece di mantenere l'ultima direzione scelta sul campo
-  precedente — evita di mostrare, ad esempio, le scadenze più lontane per prime
-  solo perché l'utente aveva invertito l'ordinamento della data di pubblicazione.
+  pubblicazione" a "Scadenza" (o viceversa), la direzione scelta **resta quella
+  attuale** — non torna al default del nuovo campo. Un solo stato di direzione,
+  condiviso tra i due campi.
 
 ### 4. Badge countdown scadenza (nuovo, su ogni card)
 
