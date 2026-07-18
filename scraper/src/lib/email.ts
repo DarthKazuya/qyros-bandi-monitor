@@ -19,7 +19,7 @@ export async function inviaEmailReale(opzioni: { a: string; oggetto: string; htm
   await axios.post(
     RESEND_API_URL,
     {
-      from: 'QYROS Bandi Monitor <onboarding@resend.dev>',
+      from: 'Fund Radar <onboarding@resend.dev>',
       to: [opzioni.a],
       subject: opzioni.oggetto,
       html: opzioni.html,
@@ -67,7 +67,7 @@ export function formattaEmailDigest(nuoviBandi: NuovoBandoTrovato[], fontiFallit
 
   return `
     <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-      <h2 style="color:#040a1b;">QYROS Bandi Monitor &mdash; ${nuoviBandi.length} nuovi bandi</h2>
+      <h2 style="color:#040a1b;">Fund Radar &mdash; ${nuoviBandi.length} nuovi bandi</h2>
       <table style="width:100%;border-collapse:collapse;">${righeBandi}</table>
       ${sezioneErrori}
     </div>

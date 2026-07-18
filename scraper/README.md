@@ -1,4 +1,4 @@
-# QYROS Bandi Monitor — scraper
+# Fund Radar — scraper
 
 ## Comandi disponibili
 

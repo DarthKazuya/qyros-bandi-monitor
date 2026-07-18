@@ -37,7 +37,7 @@ export function LoginScreen() {
       <Card sx={{ maxWidth: 400, width: '100%' }}>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h5" component="h1" gutterBottom>
-            QYROS Bandi Monitor
+            Fund Radar
           </Typography>
           {inviato ? (
             <Alert severity="success" sx={{ mt: 2 }}>

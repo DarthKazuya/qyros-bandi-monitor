@@ -57,7 +57,7 @@ async function main(): Promise<void> {
     const html = formattaEmailDigest(risultato.nuoviBandiRilevanti, risultato.fontiFallite);
     await inviaEmailReale({
       a: destinatario,
-      oggetto: `QYROS Bandi Monitor: ${risultato.nuoviBandiRilevanti.length} nuovi bandi`,
+      oggetto: `Fund Radar: ${risultato.nuoviBandiRilevanti.length} nuovi bandi`,
       html,
     });
     console.log(`Email inviata a ${destinatario}.`);

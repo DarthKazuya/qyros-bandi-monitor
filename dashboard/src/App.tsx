@@ -18,7 +18,7 @@ function App() {
       <AppBar position="sticky" color="secondary" elevation={0}>
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            QYROS Bandi Monitor
+            Fund Radar
           </Typography>
           <IconButton
             color="inherit"

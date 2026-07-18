@@ -1,4 +1,4 @@
-# QYROS Bandi Monitor — dashboard
+# Fund Radar — dashboard
 
 ## Comandi disponibili
 
