@@ -75,5 +75,19 @@ Deno.serve(async (richiesta: Request) => {
     return risposta({ ok: true }, 200);
   }
 
+  if (corpo.azione === 'revoca_utente') {
+    const { id: idUtente } = corpo;
+    if (!idUtente) {
+      return risposta({ errore: 'id è obbligatorio' }, 400);
+    }
+
+    const { error } = await client.auth.admin.deleteUser(idUtente);
+    if (error) {
+      return risposta({ errore: error.message }, 500);
+    }
+
+    return risposta({ ok: true }, 200);
+  }
+
   return risposta({ errore: 'Azione sconosciuta' }, 400);
 });
