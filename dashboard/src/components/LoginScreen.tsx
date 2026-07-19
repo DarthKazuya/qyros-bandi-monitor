@@ -16,30 +16,33 @@ export function LoginScreen() {
     setErrore(null);
     setInvioInCorso(true);
 
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.href },
-    });
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: window.location.href },
+      });
 
-    if (!error) {
-      setInvioInCorso(false);
-      setInviato(true);
-      return;
-    }
-
-    if (error.code === 'signup_disabled') {
-      const { error: erroreRichiesta } = await supabase.from('richieste_accesso').insert({ email, nome, cognome });
-      setInvioInCorso(false);
-      if (erroreRichiesta) {
-        setErrore(erroreRichiesta.message);
+      if (!error) {
+        setInviato(true);
         return;
       }
-      setRichiestaInviata(true);
-      return;
-    }
 
-    setInvioInCorso(false);
-    setErrore(error.message);
+      if (error.code === 'signup_disabled') {
+        const { error: erroreRichiesta } = await supabase.from('richieste_accesso').insert({ email, nome, cognome });
+        if (erroreRichiesta) {
+          setErrore(erroreRichiesta.message);
+          return;
+        }
+        setRichiestaInviata(true);
+        return;
+      }
+
+      setErrore(error.message);
+    } catch (err) {
+      setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
+    } finally {
+      setInvioInCorso(false);
+    }
   }
 
   const messaggioConfermato = inviato

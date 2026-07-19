@@ -19,26 +19,30 @@ export function Configurazione() {
 
   async function carica() {
     setCaricamento(true);
-    const [risultatoParole, risultatoImpostazioni] = await Promise.all([
-      supabase.from('parole_chiave').select('id, parola, livello').order('parola'),
-      supabase.from('impostazioni_job').select('id, ora, fuso_orario').eq('id', 1).single(),
-    ]);
+    try {
+      const [risultatoParole, risultatoImpostazioni] = await Promise.all([
+        supabase.from('parole_chiave').select('id, parola, livello').order('parola'),
+        supabase.from('impostazioni_job').select('id, ora, fuso_orario').eq('id', 1).single(),
+      ]);
 
-    if (risultatoParole.error) {
-      setErrore(risultatoParole.error.message);
-    } else {
-      setParoleChiave((risultatoParole.data ?? []) as ParolaChiave[]);
+      if (risultatoParole.error) {
+        setErrore(risultatoParole.error.message);
+      } else {
+        setParoleChiave((risultatoParole.data ?? []) as ParolaChiave[]);
+      }
+
+      if (risultatoImpostazioni.error) {
+        setErrore(risultatoImpostazioni.error.message);
+      } else if (risultatoImpostazioni.data) {
+        const impostazioniLette = risultatoImpostazioni.data as ImpostazioniJob;
+        setImpostazioni(impostazioniLette);
+        setOraModificata(impostazioniLette.ora);
+      }
+    } catch (err) {
+      setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
+    } finally {
+      setCaricamento(false);
     }
-
-    if (risultatoImpostazioni.error) {
-      setErrore(risultatoImpostazioni.error.message);
-    } else if (risultatoImpostazioni.data) {
-      const impostazioniLette = risultatoImpostazioni.data as ImpostazioniJob;
-      setImpostazioni(impostazioniLette);
-      setOraModificata(impostazioniLette.ora);
-    }
-
-    setCaricamento(false);
   }
 
   async function aggiungiParola() {

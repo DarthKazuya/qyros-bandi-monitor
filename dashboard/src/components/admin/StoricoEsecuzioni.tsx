@@ -21,18 +21,23 @@ export function StoricoEsecuzioni() {
   useEffect(() => {
     async function carica() {
       setCaricamento(true);
-      const { data, error } = await supabase
-        .from('job_run_log')
-        .select('id, eseguito_il, fonti_ok, fonti_fallite, nuovi_bandi')
-        .order('eseguito_il', { ascending: false })
-        .limit(30);
+      try {
+        const { data, error } = await supabase
+          .from('job_run_log')
+          .select('id, eseguito_il, fonti_ok, fonti_fallite, nuovi_bandi')
+          .order('eseguito_il', { ascending: false })
+          .limit(30);
 
-      if (error) {
-        setErrore(error.message);
-      } else {
-        setEsecuzioni((data ?? []) as EsecuzioneJob[]);
+        if (error) {
+          setErrore(error.message);
+        } else {
+          setEsecuzioni((data ?? []) as EsecuzioneJob[]);
+        }
+      } catch (err) {
+        setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
+      } finally {
+        setCaricamento(false);
       }
-      setCaricamento(false);
     }
     carica();
   }, []);

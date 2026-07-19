@@ -20,18 +20,23 @@ export function RichiesteInAttesa() {
 
   async function caricaRichieste() {
     setCaricamento(true);
-    const { data, error } = await supabase
-      .from('richieste_accesso')
-      .select('id, email, nome, cognome, richiesto_il, stato')
-      .eq('stato', 'in_attesa')
-      .order('richiesto_il', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('richieste_accesso')
+        .select('id, email, nome, cognome, richiesto_il, stato')
+        .eq('stato', 'in_attesa')
+        .order('richiesto_il', { ascending: false });
 
-    if (error) {
-      setErrore(error.message);
-    } else {
-      setRichieste((data ?? []) as RichiestaAccesso[]);
+      if (error) {
+        setErrore(error.message);
+      } else {
+        setRichieste((data ?? []) as RichiestaAccesso[]);
+      }
+    } catch (err) {
+      setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
+    } finally {
+      setCaricamento(false);
     }
-    setCaricamento(false);
   }
 
   async function approva(richiesta: RichiestaAccesso) {
