@@ -95,8 +95,11 @@ la grant `select` corrispondente per il ruolo `authenticated` — lo stesso tipo
 correzione già incontrata due volte in questo progetto (RLS da sola non basta senza
 una grant esplicita sulla tabella).
 
-`config/keywords.json` e `config/schedule.json` restano nel repository solo come
-traccia storica; lo scraper smette di leggerli.
+`config/keywords.json` e `config/schedule.json` restano nel repository come ripiego
+per i test in locale senza credenziali Supabase reali (dettagli nella sezione
+"Modifiche allo scraper" più sotto) — Supabase diventa la fonte di verità in
+produzione, i file restano la fonte di verità quando le credenziali reali non ci
+sono.
 
 ## Flusso di richiesta accesso
 
@@ -176,12 +179,24 @@ Azioni supportate (un parametro `azione` nel corpo della richiesta):
 
 ## Modifiche allo scraper
 
-`scraper/src/lib/config.ts` — `caricaKeywords()` e `caricaSchedule()` smettono di
-leggere i file JSON e interrogano invece Supabase (client già creato con
-`creaClienteSupabaseReale()`, già usato altrove nello scraper con la stessa chiave
-`service_role`), leggendo rispettivamente da `parole_chiave` e da
-`impostazioni_job`. `caricaSources()` resta invariata (legge ancora
-`config/sources.json`, fuori scope in questa fase).
+`scraper/src/lib/config.ts` — `caricaKeywords()` e `caricaSchedule()` interrogano
+Supabase (client già creato con `creaClienteSupabaseReale()`, già usato altrove nello
+scraper con la stessa chiave `service_role`), leggendo rispettivamente da
+`parole_chiave` e da `impostazioni_job`, quando le credenziali Supabase sono
+disponibili — lo stesso identico requisito già esistente oggi per il salvataggio dei
+bandi.
+
+**Comportamento di ripiego invariato**: quando `SUPABASE_URL`/
+`SUPABASE_SERVICE_ROLE_KEY` non sono impostate (test locali senza credenziali reali,
+comportamento esplicitamente documentato e già in uso da questo progetto sin dalla
+Fase 3), `caricaKeywords()` e `caricaSchedule()` continuano a leggere
+`config/keywords.json` e `config/schedule.json` esattamente come oggi — nessuna
+regressione sulla possibilità di testare l'intera pipeline in locale senza toccare
+dati reali. I due file restano quindi nel repository con un ruolo reale (fallback di
+sviluppo), non solo come traccia storica.
+
+`caricaSources()` resta invariata (legge ancora `config/sources.json` sempre, in
+ogni caso — fuori scope in questa fase).
 
 ## Migrazione dei dati esistenti
 
