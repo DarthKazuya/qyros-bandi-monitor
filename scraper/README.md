@@ -83,3 +83,15 @@ Localmente, senza le variabili d'ambiente reali impostate, `npx tsx
 src/index.ts --force` continua a funzionare esattamente come nelle fasi
 precedenti — utile per continuare a testare in locale senza toccare i dati
 reali.
+
+## Stato Fase 6a
+
+`caricaKeywords()` e `caricaSchedule()` leggono ora da Supabase (tabelle
+`parole_chiave` e `impostazioni_job`) quando le credenziali reali sono presenti,
+mantenendo `config/keywords.json`/`config/schedule.json` come ripiego per i test
+locali senza credenziali — verificato che `npx tsx src/index.ts --force` continua a
+funzionare senza toccare dati reali, esattamente come prima.
+
+Resta da fare (dopo il merge): eseguire lo schema aggiornato nell'SQL Editor di
+Supabase, pubblicare la Edge Function `admin-actions`, e verificarla con una
+chiamata reale.
