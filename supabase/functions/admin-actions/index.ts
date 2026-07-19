@@ -2,6 +2,11 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.47.10';
 
 const EMAIL_AMMINISTRATORE = 'panto75@gmail.com';
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
 function clienteServizio() {
   const url = Deno.env.get('SUPABASE_URL');
   const chiave = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
@@ -24,11 +29,15 @@ async function emailUtenteAutenticato(richiesta: Request, client: ReturnType<typ
 function risposta(corpo: Record<string, unknown>, status: number): Response {
   return new Response(JSON.stringify(corpo), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
   });
 }
 
 Deno.serve(async (richiesta: Request) => {
+  if (richiesta.method === 'OPTIONS') {
+    return new Response('ok', { headers: CORS_HEADERS });
+  }
+
   if (richiesta.method !== 'POST') {
     return risposta({ errore: 'Metodo non consentito' }, 405);
   }
