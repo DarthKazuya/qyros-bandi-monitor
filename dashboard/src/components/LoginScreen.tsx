@@ -100,7 +100,7 @@ export function LoginScreen() {
       <SchermataCentrata>
         <Alert severity="success" sx={{ mt: 2, mb: 2 }}>
           Ti abbiamo inviato un link di accesso a {email}. Apri l'email e clicca il link per
-          entrare, oppure inserisci qui sotto il codice a 6 cifre che trovi nella stessa email.
+          entrare, oppure inserisci qui sotto il codice che trovi nella stessa email.
         </Alert>
         <Box component="form" onSubmit={gestisciVerificaCodice}>
           <TextField
@@ -110,7 +110,7 @@ export function LoginScreen() {
             fullWidth
             autoFocus
             required
-            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 6 }}
+            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             InputLabelProps={{ required: false }}
             sx={{
               mb: 2,
