@@ -50,5 +50,30 @@ Deno.serve(async (richiesta: Request) => {
     return risposta({ utenti }, 200);
   }
 
+  if (corpo.azione === 'approva_richiesta') {
+    const { id, email: emailRichiedente } = corpo;
+    if (!id || !emailRichiedente) {
+      return risposta({ errore: 'id ed email sono obbligatori' }, 400);
+    }
+
+    const { error: erroreCreazione } = await client.auth.admin.createUser({
+      email: emailRichiedente,
+      email_confirm: true,
+    });
+    if (erroreCreazione) {
+      return risposta({ errore: erroreCreazione.message }, 500);
+    }
+
+    const { error: erroreAggiornamento } = await client
+      .from('richieste_accesso')
+      .update({ stato: 'approvata' })
+      .eq('id', id);
+    if (erroreAggiornamento) {
+      return risposta({ errore: erroreAggiornamento.message }, 500);
+    }
+
+    return risposta({ ok: true }, 200);
+  }
+
   return risposta({ errore: 'Azione sconosciuta' }, 400);
 });
