@@ -6,6 +6,7 @@ import { eseguiRaccolta } from './lib/orchestrator.js';
 import { eOraDiEseguire } from './lib/schedule.js';
 import type { DbPort } from './lib/db-port.js';
 import type { Scraper } from './lib/types.js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 async function costruisciScraperAttivi(): Promise<Scraper[]> {
   const fontiAttive = caricaSources().filter((f) => f.attivo && f.scraperModule);
@@ -19,17 +20,25 @@ async function costruisciScraperAttivi(): Promise<Scraper[]> {
   return scrapers;
 }
 
-function costruisciDbPort(): DbPort {
+function costruisciClienteSupabase(): SupabaseClient | null {
   if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return creaClienteSupabaseReale();
+  }
+  return null;
+}
+
+function costruisciDbPort(client: SupabaseClient | null): DbPort {
+  if (client) {
     console.log('Uso il database Supabase reale.');
-    return creaDbPortSupabase(creaClienteSupabaseReale());
+    return creaDbPortSupabase(client);
   }
   console.log('SUPABASE_URL/SUPABASE_SERVICE_ROLE_KEY assenti: uso il DbPort console (solo log, nessun salvataggio reale).');
   return creaDbPortConsole();
 }
 
 async function main(): Promise<void> {
-  const schedule = caricaSchedule();
+  const client = costruisciClienteSupabase();
+  const schedule = await caricaSchedule(client);
   const forzaEsecuzione = process.argv.includes('--force');
 
   if (!forzaEsecuzione && !eOraDiEseguire(schedule)) {
@@ -37,9 +46,9 @@ async function main(): Promise<void> {
     return;
   }
 
-  const keywords = caricaKeywords();
+  const keywords = await caricaKeywords(client);
   const scrapers = await costruisciScraperAttivi();
-  const db = costruisciDbPort();
+  const db = costruisciDbPort(client);
 
   const risultato = await eseguiRaccolta(scrapers, keywords, db);
 
