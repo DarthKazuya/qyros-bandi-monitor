@@ -179,7 +179,7 @@ describe('LoginScreen — riquadro codice', () => {
     await utente.type(screen.getByLabelText('Codice'), '000000');
     await utente.click(screen.getByRole('button', { name: 'Verifica codice' }));
 
-    await waitFor(() => expect(screen.getByText('Token has expired or is invalid')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Il codice non è corretto o è scaduto. Richiedine uno nuovo.')).toBeInTheDocument());
 
     await utente.click(screen.getByRole('button', { name: 'Richiedi un nuovo codice' }));
     expect(screen.getByLabelText('Email')).toBeInTheDocument();

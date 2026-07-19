@@ -62,7 +62,7 @@ export function LoginScreen() {
     try {
       const { error } = await supabase.auth.verifyOtp({ email, token: codice, type: 'email' });
       if (error) {
-        setErrore(error.message);
+        setErrore('Il codice non è corretto o è scaduto. Richiedine uno nuovo.');
       }
     } catch (err) {
       setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
