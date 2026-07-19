@@ -92,6 +92,8 @@ mantenendo `config/keywords.json`/`config/schedule.json` come ripiego per i test
 locali senza credenziali — verificato che `npx tsx src/index.ts --force` continua a
 funzionare senza toccare dati reali, esattamente come prima.
 
-Resta da fare (dopo il merge): eseguire lo schema aggiornato nell'SQL Editor di
-Supabase, pubblicare la Edge Function `admin-actions`, e verificarla con una
-chiamata reale.
+Schema aggiornato eseguito su Supabase, Edge Function `admin-actions` pubblicata e
+verificata con chiamate reali (richiesta senza autenticazione respinta, richiesta
+autenticata come amministratore riuscita, dati delle nuove tabelle confermati
+leggibili tramite RLS). Resta da fare: l'interfaccia del pannello nella dashboard
+(Fase 6b, un piano separato).
