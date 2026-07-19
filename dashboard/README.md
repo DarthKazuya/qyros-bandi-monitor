@@ -26,3 +26,31 @@ un controllo di non-regressione nel browser locale (schermata di login, nessun
 errore in console) — la verifica completa con dati reali avviene dopo la
 pubblicazione. Pubblicazione automatica su GitHub Pages ad ogni push su `main`
 che tocca `dashboard/**` (`.github/workflows/deploy-dashboard.yml`).
+
+## Stato Fase 6b
+
+Pannello di controllo riservato, visibile solo all'amministratore
+(`panto75@gmail.com`), aggiunto sopra al backend della Fase 6a (tabelle Supabase
+e Edge Function `admin-actions`, già live).
+
+- **Schermata di login**: guadagna i campi Nome e Cognome (obbligatori, insieme
+  all'email già presente). Se l'email inserita è già autorizzata, comportamento
+  invariato (link di accesso via email). Se non lo è, invece di mostrare l'errore
+  grezzo di Supabase, salva una richiesta di accesso (email, nome, cognome) e
+  mostra un messaggio di conferma — nessuna "Richiedi accesso" separata, è lo
+  stesso modulo di sempre.
+- **Pannello** (pulsante nell'intestazione, solo per l'amministratore): quattro
+  schede — Richieste in attesa (approva/rifiuta le richieste di accesso, con
+  approvazione che crea davvero l'utente Supabase Auth), Utenti autorizzati
+  (elenco con revoca, l'amministratore non può revocare se stesso), Storico
+  esecuzioni (sola lettura dal job giornaliero), Configurazione (parole chiave
+  aggiungibili/rimovibili per livello, orario di esecuzione modificabile).
+- **Esci**: pulsante nell'intestazione, visibile per qualunque utente collegato
+  (non solo l'amministratore).
+
+Tutto testato (nessuna chiamata di rete reale nei test automatici, tabelle e
+Edge Function mockate), più un controllo di non-regressione nel browser locale
+sulla sola schermata di login (Nome/Cognome/Email nell'ordine corretto, nessun
+errore in console) — il flusso autenticato completo (richiesta di accesso reale,
+pannello con dati reali, approvazione/rifiuto/revoca) viene verificato dopo la
+pubblicazione, in modo interattivo.
