@@ -137,3 +137,52 @@ describe('LoginScreen — Passo 1 (email)', () => {
     await waitFor(() => expect(screen.getByText('Errore di rete')).toBeInTheDocument());
   });
 });
+
+describe('LoginScreen — riquadro codice', () => {
+  async function inviaEmailAutorizzata(utente: ReturnType<typeof userEvent.setup>) {
+    render(<LoginScreen />);
+    await utente.type(screen.getByLabelText('Email'), 'mario.rossi@esempio.it');
+    await utente.click(screen.getByRole('button', { name: 'Accedi' }));
+    await waitFor(() => expect(screen.getByLabelText('Codice')).toBeInTheDocument());
+  }
+
+  it('mostra il campo Codice con tastiera numerica dopo l\'invio dell\'email', async () => {
+    const utente = userEvent.setup();
+    await inviaEmailAutorizzata(utente);
+
+    const campoCodice = screen.getByLabelText('Codice');
+    expect(campoCodice).toHaveAttribute('inputmode', 'numeric');
+    expect(screen.getByRole('button', { name: 'Verifica codice' })).toBeInTheDocument();
+  });
+
+  it('codice corretto: chiama verifyOtp con email, codice e type email', async () => {
+    const utente = userEvent.setup();
+    await inviaEmailAutorizzata(utente);
+
+    await utente.type(screen.getByLabelText('Codice'), '123456');
+    await utente.click(screen.getByRole('button', { name: 'Verifica codice' }));
+
+    await waitFor(() =>
+      expect(verifyOtpFinto).toHaveBeenCalledWith({
+        email: 'mario.rossi@esempio.it',
+        token: '123456',
+        type: 'email',
+      })
+    );
+  });
+
+  it('codice sbagliato: mostra l\'errore e un modo per tornare al passo 1', async () => {
+    verifyOtpFinto.mockResolvedValueOnce({ error: { message: 'Token has expired or is invalid' } });
+    const utente = userEvent.setup();
+    await inviaEmailAutorizzata(utente);
+
+    await utente.type(screen.getByLabelText('Codice'), '000000');
+    await utente.click(screen.getByRole('button', { name: 'Verifica codice' }));
+
+    await waitFor(() => expect(screen.getByText('Token has expired or is invalid')).toBeInTheDocument());
+
+    await utente.click(screen.getByRole('button', { name: 'Richiedi un nuovo codice' }));
+    expect(screen.getByLabelText('Email')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Codice')).not.toBeInTheDocument();
+  });
+});

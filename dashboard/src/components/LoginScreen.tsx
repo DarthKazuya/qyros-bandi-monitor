@@ -12,6 +12,8 @@ export function LoginScreen() {
   const [fase, setFase] = useState<Fase>('modulo');
   const [errore, setErrore] = useState<string | null>(null);
   const [invioInCorso, setInvioInCorso] = useState(false);
+  const [codice, setCodice] = useState('');
+  const [verificaInCorso, setVerificaInCorso] = useState(false);
 
   async function gestisciInvioModulo(evento: FormEvent) {
     evento.preventDefault();
@@ -52,6 +54,30 @@ export function LoginScreen() {
     }
   }
 
+  async function gestisciVerificaCodice(evento: FormEvent) {
+    evento.preventDefault();
+    setErrore(null);
+    setVerificaInCorso(true);
+
+    try {
+      const { error } = await supabase.auth.verifyOtp({ email, token: codice, type: 'email' });
+      if (error) {
+        setErrore(error.message);
+      }
+    } catch (err) {
+      setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
+    } finally {
+      setVerificaInCorso(false);
+    }
+  }
+
+  function richiediNuovoCodice() {
+    setFase('modulo');
+    setMostraCampiNuovoUtente(false);
+    setCodice('');
+    setErrore(null);
+  }
+
   if (fase === 'richiesta-inviata') {
     return (
       <SchermataCentrata>
@@ -65,10 +91,45 @@ export function LoginScreen() {
   if (fase === 'attesa-codice') {
     return (
       <SchermataCentrata>
-        <Alert severity="success" sx={{ mt: 2 }}>
+        <Alert severity="success" sx={{ mt: 2, mb: 2 }}>
           Ti abbiamo inviato un link di accesso a {email}. Apri l'email e clicca il link per
-          entrare.
+          entrare, oppure inserisci qui sotto il codice a 6 cifre che trovi nella stessa email.
         </Alert>
+        <Box component="form" onSubmit={gestisciVerificaCodice}>
+          <TextField
+            label="Codice"
+            value={codice}
+            onChange={(e) => setCodice(e.target.value)}
+            fullWidth
+            autoFocus
+            required
+            inputProps={{ inputMode: 'numeric', pattern: '[0-9]*', maxLength: 6 }}
+            InputLabelProps={{ required: false }}
+            sx={{
+              mb: 2,
+              '& input': { fontSize: '1.5rem', letterSpacing: '0.5rem', textAlign: 'center' },
+            }}
+          />
+          {errore && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errore}
+            </Alert>
+          )}
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            size="large"
+            disabled={verificaInCorso}
+            sx={{ minHeight: 44, mb: 1 }}
+          >
+            {verificaInCorso ? 'Verifica in corso...' : 'Verifica codice'}
+          </Button>
+          <Button variant="text" fullWidth onClick={richiediNuovoCodice} sx={{ minHeight: 44 }}>
+            Richiedi un nuovo codice
+          </Button>
+        </Box>
       </SchermataCentrata>
     );
   }
