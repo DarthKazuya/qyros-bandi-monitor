@@ -12,7 +12,8 @@ corpo JSON `{ "azione": "...", ... }`:
 
 - `elenco_utenti` — nessun parametro aggiuntivo. Restituisce `{ utenti: [...] }`.
 - `approva_richiesta` — richiede `id` (id della riga in `richieste_accesso`) ed
-  `email`. Crea l'utente Supabase Auth e marca la richiesta come approvata.
+  `email`. Crea l'utente Supabase Auth, gli invia l'email di invito con il link
+  di accesso (`inviteUserByEmail`) e marca la richiesta come approvata.
 - `revoca_utente` — richiede `id` (id dell'utente Supabase Auth). Elimina l'utente.
 
 Ogni richiesta viene rifiutata con `403` se il token non corrisponde all'email

@@ -1,6 +1,7 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.47.10';
 
 const EMAIL_AMMINISTRATORE = 'panto75@gmail.com';
+const URL_DASHBOARD = 'https://darthkazuya.github.io/qyros-bandi-monitor/';
 
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
@@ -65,9 +66,8 @@ Deno.serve(async (richiesta: Request) => {
       return risposta({ errore: 'id ed email sono obbligatori' }, 400);
     }
 
-    const { error: erroreCreazione } = await client.auth.admin.createUser({
-      email: emailRichiedente,
-      email_confirm: true,
+    const { error: erroreCreazione } = await client.auth.admin.inviteUserByEmail(emailRichiedente, {
+      redirectTo: URL_DASHBOARD,
     });
     if (erroreCreazione) {
       return risposta({ errore: erroreCreazione.message }, 500);
