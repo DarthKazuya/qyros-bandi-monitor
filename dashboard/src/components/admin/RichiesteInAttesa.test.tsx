@@ -35,7 +35,7 @@ vi.mock('../../lib/supabase', () => ({
   },
 }));
 
-const chiamaAdminActionsFinta = vi.fn(async () => ({ ok: true }));
+const chiamaAdminActionsFinta = vi.fn(async (..._args: unknown[]) => ({ ok: true }));
 vi.mock('../../lib/admin', () => ({
   chiamaAdminActions: (...args: unknown[]) => chiamaAdminActionsFinta(...args),
 }));
