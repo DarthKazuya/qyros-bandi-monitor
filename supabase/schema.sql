@@ -54,3 +54,95 @@ grant all on table public.bandi to service_role;
 -- volte. Solo select/update: la dashboard non deve poter inserire o cancellare
 -- righe, quello resta compito esclusivo del job (service_role).
 grant select, update on table public.bandi to authenticated;
+
+-- Fase 6: pannello di controllo riservato
+
+create table if not exists richieste_accesso (
+  id uuid primary key default gen_random_uuid(),
+  email text not null,
+  nome text not null,
+  cognome text not null,
+  richiesto_il timestamptz not null default now(),
+  stato text not null default 'in_attesa' check (stato in ('in_attesa', 'approvata', 'rifiutata'))
+);
+
+create table if not exists parole_chiave (
+  id uuid primary key default gen_random_uuid(),
+  parola text not null,
+  livello text not null check (livello in ('livello1', 'livello2')),
+  unique (parola, livello)
+);
+
+create table if not exists impostazioni_job (
+  id int primary key default 1,
+  ora int not null check (ora >= 0 and ora <= 23),
+  fuso_orario text not null default 'Europe/Rome'
+);
+
+alter table richieste_accesso enable row level security;
+alter table parole_chiave enable row level security;
+alter table impostazioni_job enable row level security;
+
+-- Un solo amministratore, per disegno di questa fase: panto75@gmail.com.
+create policy "richieste_accesso_admin_select" on richieste_accesso
+  for select to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "richieste_accesso_admin_update" on richieste_accesso
+  for update to authenticated
+  using (auth.jwt() ->> 'email' = 'panto75@gmail.com')
+  with check (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "richieste_accesso_public_insert" on richieste_accesso
+  for insert to anon, authenticated with check (true);
+
+create policy "parole_chiave_admin_select" on parole_chiave
+  for select to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "parole_chiave_admin_insert" on parole_chiave
+  for insert to authenticated with check (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "parole_chiave_admin_delete" on parole_chiave
+  for delete to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "impostazioni_job_admin_select" on impostazioni_job
+  for select to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "impostazioni_job_admin_update" on impostazioni_job
+  for update to authenticated
+  using (auth.jwt() ->> 'email' = 'panto75@gmail.com')
+  with check (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "job_run_log_admin_select" on job_run_log
+  for select to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+-- Grant espliciti: RLS da sola non basta senza queste, come già scoperto due volte.
+grant select, insert, update on table public.richieste_accesso to anon, authenticated;
+grant select, insert, delete on table public.parole_chiave to authenticated;
+grant select, update on table public.impostazioni_job to authenticated;
+grant select on table public.job_run_log to authenticated;
+grant all on table public.richieste_accesso to service_role;
+grant all on table public.parole_chiave to service_role;
+grant all on table public.impostazioni_job to service_role;
+
+-- Migrazione una tantum dei valori oggi in config/keywords.json e config/schedule.json.
+insert into parole_chiave (parola, livello) values
+  ('gaming', 'livello1'),
+  ('fintech', 'livello1'),
+  ('regtech', 'livello1'),
+  ('economia circolare', 'livello1'),
+  ('circular economy', 'livello1'),
+  ('intelligenza artificiale', 'livello2'),
+  ('artificial intelligence', 'livello2'),
+  ('ai', 'livello2'),
+  ('tecnologia', 'livello2'),
+  ('tecnologico', 'livello2'),
+  ('technology', 'livello2'),
+  ('tech', 'livello2'),
+  ('startup', 'livello2'),
+  ('start-up', 'livello2'),
+  ('innovazione', 'livello2'),
+  ('innovation', 'livello2')
+on conflict (parola, livello) do nothing;
+
+insert into impostazioni_job (id, ora, fuso_orario) values (1, 8, 'Europe/Rome')
+on conflict (id) do nothing;
