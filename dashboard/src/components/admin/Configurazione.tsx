@@ -111,7 +111,13 @@ export function Configurazione() {
                   key={parola.id}
                   label={parola.parola}
                   onDelete={() => rimuoviParola(parola)}
-                  sx={{ minHeight: 44 }}
+                  sx={{
+                    minHeight: 44,
+                    '& .MuiChip-deleteIcon': {
+                      fontSize: '1.3rem',
+                      margin: '0 6px 0 -6px',
+                    },
+                  }}
                 />
               ))}
           </Box>
@@ -124,12 +130,13 @@ export function Configurazione() {
           size="small"
           value={nuovaParola}
           onChange={(e) => setNuovaParola(e.target.value)}
-          sx={{ flex: 1, minWidth: 200 }}
+          sx={{ flex: 1, minWidth: 200, minHeight: 44 }}
         />
         <Select
           size="small"
           value={nuovoLivello}
           onChange={(e) => setNuovoLivello(e.target.value as 'livello1' | 'livello2')}
+          sx={{ minHeight: 44 }}
         >
           <MenuItem value="livello1">Livello 1</MenuItem>
           <MenuItem value="livello2">Livello 2</MenuItem>
@@ -150,7 +157,7 @@ export function Configurazione() {
           value={oraModificata}
           onChange={(e) => setOraModificata(Number(e.target.value))}
           inputProps={{ min: 0, max: 23 }}
-          sx={{ width: 140 }}
+          sx={{ width: 140, minHeight: 44 }}
         />
         <Button variant="contained" disabled={salvataggioOraInCorso} onClick={salvaOra} sx={{ minHeight: 44 }}>
           Salva
