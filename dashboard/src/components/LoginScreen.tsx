@@ -78,6 +78,13 @@ export function LoginScreen() {
     setErrore(null);
   }
 
+  function annullaRichiestaNuovoUtente() {
+    setMostraCampiNuovoUtente(false);
+    setNome('');
+    setCognome('');
+    setErrore(null);
+  }
+
   if (fase === 'richiesta-inviata') {
     return (
       <SchermataCentrata>
@@ -192,6 +199,16 @@ export function LoginScreen() {
         >
           {invioInCorso ? 'Invio in corso...' : mostraCampiNuovoUtente ? 'Richiedi accesso' : 'Accedi'}
         </Button>
+        {mostraCampiNuovoUtente && (
+          <Button
+            variant="text"
+            fullWidth
+            onClick={annullaRichiestaNuovoUtente}
+            sx={{ minHeight: 44, mt: 1 }}
+          >
+            Cambia email
+          </Button>
+        )}
       </Box>
     </SchermataCentrata>
   );

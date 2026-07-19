@@ -136,6 +136,25 @@ describe('LoginScreen — Passo 1 (email)', () => {
 
     await waitFor(() => expect(screen.getByText('Errore di rete')).toBeInTheDocument());
   });
+
+  it('permette di tornare indietro e correggere l\'email dopo l\'espansione a Nome/Cognome', async () => {
+    signInWithOtpFinto.mockResolvedValueOnce({
+      error: { message: 'Signups not allowed for this instance', code: 'signup_disabled' },
+    });
+    const utente = userEvent.setup();
+    render(<LoginScreen />);
+
+    await utente.type(screen.getByLabelText('Email'), 'errore@esempio.it');
+    await utente.click(screen.getByRole('button', { name: 'Accedi' }));
+    await waitFor(() => expect(screen.getByLabelText('Nome')).toBeInTheDocument());
+
+    await utente.click(screen.getByRole('button', { name: 'Cambia email' }));
+
+    expect(screen.queryByLabelText('Nome')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Cognome')).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Email')).not.toBeDisabled();
+    expect(inserisciRichiestaFinto).not.toHaveBeenCalled();
+  });
 });
 
 describe('LoginScreen — riquadro codice', () => {
