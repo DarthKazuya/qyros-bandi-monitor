@@ -158,3 +158,33 @@ where email = 'panto75@gmail.com';
 -- di ogni bando (invece di mostrare solo l'etichetta astratta "Match
 -- diretto"/"Da verificare" nella dashboard).
 alter table bandi add column if not exists parole_corrispondenti text[] not null default '{}';
+
+-- Fase 6e: suggerimenti di nuove parole chiave da parte di utenti loggati
+-- (non solo l'amministratore). Stesso schema di approvazione già usato per
+-- richieste_accesso: chiunque autenticato può proporre, solo l'amministratore
+-- legge/gestisce.
+create table if not exists suggerimenti_parole_chiave (
+  id uuid primary key default gen_random_uuid(),
+  parola text not null,
+  proposto_da text not null default (auth.jwt() ->> 'email'),
+  proposto_il timestamptz not null default now(),
+  stato text not null default 'in_attesa' check (stato in ('in_attesa', 'accettato', 'rifiutato'))
+);
+
+alter table suggerimenti_parole_chiave enable row level security;
+
+create policy "suggerimenti_insert_authenticated" on suggerimenti_parole_chiave
+  for insert to authenticated with check (true);
+
+create policy "suggerimenti_admin_select" on suggerimenti_parole_chiave
+  for select to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+create policy "suggerimenti_admin_update" on suggerimenti_parole_chiave
+  for update to authenticated
+  using (auth.jwt() ->> 'email' = 'panto75@gmail.com')
+  with check (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+
+-- Grant esplicita: RLS da sola non basta senza questa (già scoperto due
+-- volte in questo progetto).
+grant select, insert, update on table public.suggerimenti_parole_chiave to authenticated;
+grant all on table public.suggerimenti_parole_chiave to service_role;
