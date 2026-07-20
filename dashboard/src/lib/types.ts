@@ -11,6 +11,7 @@ export interface Bando {
   data_pubblicazione: string | null;
   priorita: Priorita | null;
   stato: Stato;
+  parole_corrispondenti: string[];
 }
 
 export interface RichiestaAccesso {

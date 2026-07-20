@@ -13,6 +13,7 @@ function creaBando(overrides: Partial<Bando> = {}): Bando {
     data_pubblicazione: null,
     priorita: 'alta',
     stato: 'nuovo',
+    parole_corrispondenti: [],
     ...overrides,
   };
 }

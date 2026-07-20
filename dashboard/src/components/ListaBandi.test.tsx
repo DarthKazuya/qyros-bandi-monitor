@@ -14,6 +14,7 @@ function creaBando(overrides: Partial<Bando> = {}): Bando {
     data_pubblicazione: '2026-01-01',
     priorita: 'alta',
     stato: 'nuovo',
+    parole_corrispondenti: [],
     ...overrides,
   };
 }

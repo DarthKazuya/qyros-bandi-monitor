@@ -31,7 +31,7 @@ export function ListaBandi() {
     setCaricamento(true);
     const { data, error } = await supabase
       .from('bandi')
-      .select('id, fonte, titolo, descrizione, url, scadenza, data_pubblicazione, priorita, stato')
+      .select('id, fonte, titolo, descrizione, url, scadenza, data_pubblicazione, priorita, stato, parole_corrispondenti')
       .eq('scartato', false)
       .order('data_pubblicazione', { ascending: false });
 

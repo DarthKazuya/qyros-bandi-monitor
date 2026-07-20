@@ -34,15 +34,17 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
     <Card sx={{ opacity: eVisto ? 0.6 : 1, transition: 'opacity 0.2s ease', height: '100%' }}>
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
-          <Chip
-            label={eAlta ? 'Match diretto' : 'Da verificare'}
-            size="small"
-            sx={{
-              bgcolor: eAlta ? 'primary.main' : 'secondary.main',
-              color: '#ffffff',
-              fontWeight: 600,
-            }}
-          />
+          {bando.parole_corrispondenti.length > 0 && (
+            <Chip
+              label={`Corrisponde a: ${bando.parole_corrispondenti.join(', ')}`}
+              size="small"
+              sx={{
+                bgcolor: eAlta ? 'primary.main' : 'secondary.main',
+                color: '#ffffff',
+                fontWeight: 600,
+              }}
+            />
+          )}
           <Button
             size="small"
             startIcon={eVisto ? <VisibilityOffIcon /> : <VisibilityIcon />}

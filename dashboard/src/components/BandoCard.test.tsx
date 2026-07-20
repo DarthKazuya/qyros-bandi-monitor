@@ -22,19 +22,26 @@ function creaBando(overrides: Partial<Bando> = {}): Bando {
     data_pubblicazione: null,
     priorita: 'alta',
     stato: 'nuovo',
+    parole_corrispondenti: ['gaming'],
     ...overrides,
   };
 }
 
 describe('BandoCard', () => {
-  it('mostra il badge "Match diretto" per priorita alta', () => {
-    render(<BandoCard bando={creaBando({ priorita: 'alta' })} onCambiaStato={vi.fn()} />);
-    expect(screen.getByText('Match diretto')).toBeInTheDocument();
+  it('mostra la parola chiave corrispondente invece di un\'etichetta astratta', () => {
+    render(<BandoCard bando={creaBando({ parole_corrispondenti: ['fintech'] })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('Corrisponde a: fintech')).toBeInTheDocument();
   });
 
-  it('mostra il badge "Da verificare" per priorita da_verificare', () => {
-    render(<BandoCard bando={creaBando({ priorita: 'da_verificare' })} onCambiaStato={vi.fn()} />);
-    expect(screen.getByText('Da verificare')).toBeInTheDocument();
+  it('elenca più parole corrispondenti separate da virgola', () => {
+    render(<BandoCard bando={creaBando({ parole_corrispondenti: ['gaming', 'fintech'] })} onCambiaStato={vi.fn()} />);
+    expect(screen.getByText('Corrisponde a: gaming, fintech')).toBeInTheDocument();
+  });
+
+  it('non mostra il vecchio badge "Match diretto"/"Da verificare"', () => {
+    render(<BandoCard bando={creaBando({ priorita: 'alta', parole_corrispondenti: ['gaming'] })} onCambiaStato={vi.fn()} />);
+    expect(screen.queryByText('Match diretto')).not.toBeInTheDocument();
+    expect(screen.queryByText('Da verificare')).not.toBeInTheDocument();
   });
 
   it('mostra titolo, fonte e scadenza formattata in italiano', () => {
