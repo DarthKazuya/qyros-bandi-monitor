@@ -47,9 +47,13 @@ semantici di MUI (non su chiavi custom), così ogni componente MUI esistente
 
 Regola d'inversione per `secondary`, `info` ed `error`: sfondo chiaro + testo
 scuro della stessa famiglia in tema chiaro; sfondo scuro + testo chiaro della
-stessa famiglia in tema scuro. Non si introduce alcuna chiave palette custom
-nuova (niente `palette.neutral`): il ruolo neutro riusa `info`, che oggi non
-è referenziato da nessun componente del sito.
+stessa famiglia in tema scuro. Non si introduce alcun ruolo palette
+completamente nuovo (niente `palette.neutral` separato): il ruolo neutro
+riusa `info`, che oggi non è referenziato da nessun componente del sito. Per
+realizzare lo sfondo-chiaro/scuro dei badge (diverso dal tono "base" di
+`secondary`/`info`, usato altrove per bordi/icone), `secondary` e `info`
+guadagnano due proprietà aggiuntive `container`/`onContainer` — un'estensione
+minima e localizzata dei due ruoli esistenti, non una struttura separata.
 
 ## 2. Font
 
