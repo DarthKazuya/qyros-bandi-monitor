@@ -74,8 +74,10 @@ export function UtentiAutorizzati() {
                 key={utente.id}
                 sx={{
                   display: 'flex',
+                  flexDirection: { xs: 'column', sm: 'row' },
                   justifyContent: 'space-between',
-                  alignItems: 'center',
+                  alignItems: { xs: 'flex-start', sm: 'center' },
+                  gap: { xs: 1, sm: 0 },
                   p: 2,
                   border: '1px solid',
                   borderColor: 'divider',

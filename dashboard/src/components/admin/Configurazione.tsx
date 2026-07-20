@@ -167,7 +167,17 @@ export function Configurazione() {
           {suggerimenti.map((suggerimento) => (
             <Box
               key={suggerimento.id}
-              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                justifyContent: 'space-between',
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                gap: { xs: 1, sm: 0 },
+                p: 1.5,
+                border: '1px solid',
+                borderColor: 'divider',
+                borderRadius: 2,
+              }}
             >
               <Box>
                 <Typography>{suggerimento.parola}</Typography>
