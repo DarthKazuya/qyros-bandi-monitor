@@ -55,6 +55,14 @@ describe('RichiesteInAttesa', () => {
     expect(screen.getByText(/mario.rossi@esempio.it/)).toBeInTheDocument();
   });
 
+  it('mostra data e ora complete di secondi nella richiesta', async () => {
+    render(<RichiesteInAttesa />);
+    await waitFor(() => expect(screen.getByText('Mario Rossi')).toBeInTheDocument());
+    expect(
+      screen.getByText((testo) => /richiesta il \d{2}\/\d{2}\/\d{4}, \d{2}:\d{2}:\d{2}/.test(testo))
+    ).toBeInTheDocument();
+  });
+
   it('mostra un messaggio quando non ci sono richieste', async () => {
     datiFinti = [];
     render(<RichiesteInAttesa />);
