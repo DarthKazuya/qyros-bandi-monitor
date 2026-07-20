@@ -94,7 +94,7 @@ export function ListaBandi() {
   }
 
   return (
-    <Box sx={{ maxWidth: 1200, mx: 'auto', px: 2, pb: 4 }}>
+    <Box sx={{ maxWidth: 1200, mx: 'auto', px: { xs: 1.5, sm: 2 }, pb: 4 }}>
       <FiltriBar
         filtri={filtri}
         fontiDisponibili={FONTI_ATTIVE}
