@@ -95,8 +95,13 @@ create policy "richieste_accesso_admin_update" on richieste_accesso
 create policy "richieste_accesso_public_insert" on richieste_accesso
   for insert to anon, authenticated with check (true);
 
-create policy "parole_chiave_admin_select" on parole_chiave
-  for select to authenticated using (auth.jwt() ->> 'email' = 'panto75@gmail.com');
+-- Corretta durante l'implementazione della Fase 6e: prima solo l'admin
+-- poteva leggere le parole chiave (aveva senso finché le leggeva solo
+-- Configurazione). Ora anche FiltriBar le legge per mostrare i filtri a
+-- tutti gli utenti loggati, quindi la lettura deve essere aperta a
+-- chiunque sia autenticato — inserimento/cancellazione restano solo admin.
+create policy "parole_chiave_authenticated_select" on parole_chiave
+  for select to authenticated using (true);
 
 create policy "parole_chiave_admin_insert" on parole_chiave
   for insert to authenticated with check (auth.jwt() ->> 'email' = 'panto75@gmail.com');
@@ -195,9 +200,17 @@ alter table parole_chiave add column if not exists contatore_click integer not n
 
 -- Incremento atomico lato database: evita che due click quasi simultanei si
 -- perdano a vicenda se calcolati lato client (leggi valore, scrivi valore+1).
+--
+-- security definer + search_path bloccato: senza, la funzione girerebbe con
+-- i permessi di chi la chiama (authenticated), che ha solo select/insert/
+-- delete su parole_chiave (mai update, vedi grant più sotto) — l'update
+-- fallirebbe con "permission denied" per chiunque, amministratore incluso.
+-- Scoperto durante l'implementazione della Fase 6e, prima della pubblicazione.
 create or replace function increment_click_parola(id_parola uuid)
 returns void
 language sql
+security definer
+set search_path = public
 as $$
   update parole_chiave set contatore_click = contatore_click + 1 where id = id_parola;
 $$;
