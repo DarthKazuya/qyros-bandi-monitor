@@ -96,33 +96,36 @@ describe('applicaFiltri', () => {
 
 describe('applicaFiltri — parole chiave', () => {
   it('non filtra nulla se nessuna parola chiave è selezionata', () => {
-    const bandi = [creaBando({ id: '1', titolo: 'Bando gaming' }), creaBando({ id: '2', titolo: 'Altro bando' })];
+    const bandi = [
+      creaBando({ id: '1', parole_corrispondenti: ['gaming'] }),
+      creaBando({ id: '2', parole_corrispondenti: [] }),
+    ];
     expect(applicaFiltri(bandi, filtriBase).map((b) => b.id)).toEqual(['1', '2']);
   });
 
-  it('filtra per una singola parola chiave (case/accenti/trattini insensibili)', () => {
+  it('filtra per una singola parola chiave, in base alle parole già corrispondenti al bando', () => {
     const bandi = [
-      creaBando({ id: '1', titolo: 'Bando START-UP innovative' }),
-      creaBando({ id: '2', titolo: 'Bando qualsiasi' }),
+      creaBando({ id: '1', parole_corrispondenti: ['startup'] }),
+      creaBando({ id: '2', parole_corrispondenti: ['gaming'] }),
     ];
     const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['startup'] });
     expect(risultato.map((b) => b.id)).toEqual(['1']);
   });
 
-  it('con più parole chiave selezionate richiede che siano tutte presenti (AND)', () => {
+  it('con più parole chiave selezionate mostra i bandi che corrispondono ad almeno una (OR)', () => {
     const bandi = [
-      creaBando({ id: '1', titolo: 'Bando gaming e startup insieme' }),
-      creaBando({ id: '2', titolo: 'Bando solo gaming' }),
-      creaBando({ id: '3', titolo: 'Bando solo startup' }),
+      creaBando({ id: '1', parole_corrispondenti: ['gaming'] }),
+      creaBando({ id: '2', parole_corrispondenti: ['startup'] }),
+      creaBando({ id: '3', parole_corrispondenti: ['fintech'] }),
     ];
     const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['gaming', 'startup'] });
-    expect(risultato.map((b) => b.id)).toEqual(['1']);
+    expect(risultato.map((b) => b.id).sort()).toEqual(['1', '2']);
   });
 
-  it('cerca anche nella descrizione, non solo nel titolo', () => {
-    const bandi = [creaBando({ id: '1', titolo: 'Bando X', descrizione: 'per il settore gaming' })];
+  it('non mostra un bando se nessuna delle sue parole corrispondenti è tra quelle selezionate', () => {
+    const bandi = [creaBando({ id: '1', parole_corrispondenti: ['fintech'] })];
     const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['gaming'] });
-    expect(risultato.map((b) => b.id)).toEqual(['1']);
+    expect(risultato).toEqual([]);
   });
 });
 

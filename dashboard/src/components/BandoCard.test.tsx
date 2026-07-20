@@ -30,14 +30,15 @@ function creaBando(overrides: Partial<Bando> = {}): Bando {
 }
 
 describe('BandoCard', () => {
-  it('mostra la parola chiave corrispondente invece di un\'etichetta astratta', () => {
+  it('mostra la parola chiave corrispondente come badge, senza etichetta astratta', () => {
     render(<BandoCard bando={creaBando({ parole_corrispondenti: ['fintech'] })} onCambiaStato={vi.fn()} />);
-    expect(screen.getByText('Corrisponde a: fintech')).toBeInTheDocument();
+    expect(screen.getByText('fintech')).toBeInTheDocument();
   });
 
-  it('elenca più parole corrispondenti separate da virgola', () => {
+  it('mostra più parole corrispondenti come badge distinti', () => {
     render(<BandoCard bando={creaBando({ parole_corrispondenti: ['gaming', 'fintech'] })} onCambiaStato={vi.fn()} />);
-    expect(screen.getByText('Corrisponde a: gaming, fintech')).toBeInTheDocument();
+    expect(screen.getByText('gaming')).toBeInTheDocument();
+    expect(screen.getByText('fintech')).toBeInTheDocument();
   });
 
   it('non mostra il vecchio badge "Match diretto"/"Da verificare"', () => {
@@ -46,9 +47,13 @@ describe('BandoCard', () => {
     expect(screen.queryByText('Da verificare')).not.toBeInTheDocument();
   });
 
-  it('non mostra alcun badge quando non ci sono parole corrispondenti', () => {
-    render(<BandoCard bando={creaBando({ parole_corrispondenti: [] })} onCambiaStato={vi.fn()} />);
-    expect(screen.queryByText(/Corrisponde a/)).not.toBeInTheDocument();
+  it('non mostra alcun badge di parola chiave quando non ci sono corrispondenze', () => {
+    const { container } = render(
+      <BandoCard bando={creaBando({ parole_corrispondenti: [] })} onCambiaStato={vi.fn()} />
+    );
+    // con parole_corrispondenti vuoto resta solo il badge dei giorni alla scadenza
+    // (creaBando imposta di default una scadenza futura)
+    expect(container.querySelectorAll('.MuiChip-root')).toHaveLength(1);
   });
 
   it('mostra titolo, fonte e scadenza formattata in italiano', () => {
@@ -119,7 +124,7 @@ describe('BandoCard', () => {
         <BandoCard bando={creaBando({ priorita: 'alta', parole_corrispondenti: ['fintech'] })} onCambiaStato={vi.fn()} />
       </ThemeProvider>
     );
-    const chip = screen.getByText('Corrisponde a: fintech').closest('.MuiChip-root');
+    const chip = screen.getByText('fintech').closest('.MuiChip-root');
     expect(chip).toHaveStyle({ backgroundColor: 'rgb(210, 239, 240)' });
   });
 
@@ -129,7 +134,7 @@ describe('BandoCard', () => {
         <BandoCard bando={creaBando({ priorita: 'da_verificare', parole_corrispondenti: ['tech'] })} onCambiaStato={vi.fn()} />
       </ThemeProvider>
     );
-    const chip = screen.getByText('Corrisponde a: tech').closest('.MuiChip-root');
+    const chip = screen.getByText('tech').closest('.MuiChip-root');
     expect(chip).toHaveStyle({ backgroundColor: 'rgb(236, 239, 241)' });
   });
 

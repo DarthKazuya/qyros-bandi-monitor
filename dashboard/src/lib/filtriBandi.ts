@@ -1,5 +1,4 @@
 import type { Bando, Priorita } from './types';
-import { normalizzaTesto } from './normalizzaTesto';
 
 export interface FiltriStato {
   priorita: Priorita | 'tutti';
@@ -29,10 +28,9 @@ export function applicaFiltri(bandi: Bando[], filtri: FiltriStato): Bando[] {
   }
 
   if (filtri.paroleChiave.length > 0) {
-    risultato = risultato.filter((b) => {
-      const testoNormalizzato = normalizzaTesto(`${b.titolo} ${b.descrizione}`);
-      return filtri.paroleChiave.every((parola) => testoNormalizzato.includes(normalizzaTesto(parola)));
-    });
+    risultato = risultato.filter((b) =>
+      filtri.paroleChiave.some((parola) => b.parole_corrispondenti.includes(parola))
+    );
   }
 
   const query = filtri.ricerca.trim().toLowerCase();

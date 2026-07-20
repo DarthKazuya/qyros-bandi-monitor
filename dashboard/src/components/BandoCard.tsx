@@ -35,15 +35,20 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
       <CardContent>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
           {bando.parole_corrispondenti.length > 0 && (
-            <Chip
-              label={`Corrisponde a: ${bando.parole_corrispondenti.join(', ')}`}
-              size="small"
-              sx={{
-                bgcolor: eAlta ? 'secondary.container' : 'info.container',
-                color: eAlta ? 'secondary.onContainer' : 'info.onContainer',
-                fontWeight: 600,
-              }}
-            />
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, flex: 1 }}>
+              {bando.parole_corrispondenti.map((parola) => (
+                <Chip
+                  key={parola}
+                  label={parola}
+                  size="small"
+                  sx={{
+                    bgcolor: eAlta ? 'secondary.container' : 'info.container',
+                    color: eAlta ? 'secondary.onContainer' : 'info.onContainer',
+                    fontWeight: 600,
+                  }}
+                />
+              ))}
+            </Box>
           )}
           <Button
             size="small"
