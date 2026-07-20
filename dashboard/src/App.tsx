@@ -8,11 +8,13 @@ import {
   IconButton,
   ThemeProvider,
   Toolbar,
+  Tooltip,
   Typography,
 } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import LogoutIcon from '@mui/icons-material/Logout';
+import BugReportIcon from '@mui/icons-material/BugReport';
 import { creaTemaQyros } from './theme';
 import { useAuth } from './hooks/useAuth';
 import { supabase } from './lib/supabase';
@@ -42,23 +44,40 @@ function App() {
               {vistaAdmin ? 'Bandi' : 'Pannello'}
             </Button>
           )}
-          <IconButton
-            color="inherit"
-            onClick={() => setModalita((m) => (m === 'dark' ? 'light' : 'dark'))}
-            aria-label="Cambia tema chiaro/scuro"
-            sx={{ minWidth: 44, minHeight: 44 }}
-          >
-            {modalita === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
-          </IconButton>
-          {sessione && (
+          <Tooltip title={modalita === 'dark' ? 'Tema chiaro' : 'Tema scuro'} enterDelay={0}>
             <IconButton
               color="inherit"
-              onClick={() => supabase.auth.signOut()}
-              aria-label="Esci"
+              onClick={() => setModalita((m) => (m === 'dark' ? 'light' : 'dark'))}
+              aria-label="Cambia tema chiaro/scuro"
               sx={{ minWidth: 44, minHeight: 44 }}
             >
-              <LogoutIcon />
+              {modalita === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
             </IconButton>
+          </Tooltip>
+          {sessione && (
+            <Tooltip title="Segnala" enterDelay={0}>
+              <IconButton
+                color="inherit"
+                component="a"
+                href="mailto:panto75@gmail.com?subject=Segnalazione%20Fund%20Radar"
+                aria-label="Segnala un problema o un suggerimento"
+                sx={{ minWidth: 44, minHeight: 44 }}
+              >
+                <BugReportIcon />
+              </IconButton>
+            </Tooltip>
+          )}
+          {sessione && (
+            <Tooltip title="Esci" enterDelay={0}>
+              <IconButton
+                color="inherit"
+                onClick={() => supabase.auth.signOut()}
+                aria-label="Esci"
+                sx={{ minWidth: 44, minHeight: 44 }}
+              >
+                <LogoutIcon />
+              </IconButton>
+            </Tooltip>
           )}
         </Toolbar>
       </AppBar>

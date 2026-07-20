@@ -53,6 +53,37 @@ describe('App', () => {
     expect(screen.getByTestId('Brightness4Icon')).toBeInTheDocument();
   });
 
+  it('mostra "Tema chiaro" al passaggio del mouse quando si è in modalità scura', async () => {
+    vi.mocked(useAuth).mockReturnValue({ sessione: null, caricamento: false });
+    const utente = userEvent.setup();
+    render(<App />);
+
+    await utente.hover(screen.getByLabelText('Cambia tema chiaro/scuro'));
+    expect(await screen.findByText('Tema chiaro')).toBeInTheDocument();
+  });
+
+  it('mostra "Tema scuro" al passaggio del mouse dopo aver attivato la modalità chiara', async () => {
+    vi.mocked(useAuth).mockReturnValue({ sessione: null, caricamento: false });
+    const utente = userEvent.setup();
+    render(<App />);
+
+    await utente.click(screen.getByLabelText('Cambia tema chiaro/scuro'));
+    await utente.hover(screen.getByLabelText('Cambia tema chiaro/scuro'));
+    expect(await screen.findByText('Tema scuro')).toBeInTheDocument();
+  });
+
+  it('mostra "Esci" al passaggio del mouse sul pulsante di logout', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      sessione: creaSessioneFinta('mario.rossi@esempio.it'),
+      caricamento: false,
+    });
+    const utente = userEvent.setup();
+    render(<App />);
+
+    await utente.hover(screen.getByLabelText('Esci'));
+    expect(await screen.findByText('Esci', { selector: '[role="tooltip"]' })).toBeInTheDocument();
+  });
+
   it('mostra il pulsante Esci quando c\'è una sessione, e lo chiama al click', async () => {
     vi.mocked(useAuth).mockReturnValue({
       sessione: creaSessioneFinta('mario.rossi@esempio.it'),
@@ -69,6 +100,23 @@ describe('App', () => {
     vi.mocked(useAuth).mockReturnValue({ sessione: null, caricamento: false });
     render(<App />);
     expect(screen.queryByLabelText('Esci')).not.toBeInTheDocument();
+  });
+
+  it('mostra il pulsante Segnala per un utente collegato, con link mailto', () => {
+    vi.mocked(useAuth).mockReturnValue({
+      sessione: creaSessioneFinta('mario.rossi@esempio.it'),
+      caricamento: false,
+    });
+    render(<App />);
+
+    const link = screen.getByLabelText('Segnala un problema o un suggerimento');
+    expect(link).toHaveAttribute('href', 'mailto:panto75@gmail.com?subject=Segnalazione%20Fund%20Radar');
+  });
+
+  it('non mostra il pulsante Segnala quando non c\'è sessione', () => {
+    vi.mocked(useAuth).mockReturnValue({ sessione: null, caricamento: false });
+    render(<App />);
+    expect(screen.queryByLabelText('Segnala un problema o un suggerimento')).not.toBeInTheDocument();
   });
 
   it('non mostra il pulsante Pannello per un utente non amministratore', () => {
