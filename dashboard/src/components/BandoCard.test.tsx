@@ -118,24 +118,19 @@ describe('BandoCard', () => {
     expect(screen.queryByText('Scaduto')).not.toBeInTheDocument();
   });
 
-  it('usa il tono container teal per i bandi ad alta priorità', () => {
+  it('usa lo stesso tono teal per il badge della parola chiave, a prescindere dalla priorità del bando', () => {
     render(
       <ThemeProvider theme={creaTemaQyros('light')}>
-        <BandoCard bando={creaBando({ priorita: 'alta', parole_corrispondenti: ['fintech'] })} onCambiaStato={vi.fn()} />
+        <>
+          <BandoCard bando={creaBando({ id: 'a', priorita: 'alta', parole_corrispondenti: ['fintech'] })} onCambiaStato={vi.fn()} />
+          <BandoCard bando={creaBando({ id: 'b', priorita: 'da_verificare', parole_corrispondenti: ['tech'] })} onCambiaStato={vi.fn()} />
+        </>
       </ThemeProvider>
     );
-    const chip = screen.getByText('fintech').closest('.MuiChip-root');
-    expect(chip).toHaveStyle({ backgroundColor: 'rgb(210, 239, 240)' });
-  });
-
-  it('usa il tono container grigio-blu per i bandi da verificare', () => {
-    render(
-      <ThemeProvider theme={creaTemaQyros('light')}>
-        <BandoCard bando={creaBando({ priorita: 'da_verificare', parole_corrispondenti: ['tech'] })} onCambiaStato={vi.fn()} />
-      </ThemeProvider>
-    );
-    const chip = screen.getByText('tech').closest('.MuiChip-root');
-    expect(chip).toHaveStyle({ backgroundColor: 'rgb(236, 239, 241)' });
+    const chipAlta = screen.getByText('fintech').closest('.MuiChip-root');
+    const chipDaVerificare = screen.getByText('tech').closest('.MuiChip-root');
+    expect(chipAlta).toHaveStyle({ backgroundColor: 'rgb(210, 239, 240)' });
+    expect(chipDaVerificare).toHaveStyle({ backgroundColor: 'rgb(210, 239, 240)' });
   });
 
   it('usa il colore di avviso, non di errore, per un bando in scadenza', () => {

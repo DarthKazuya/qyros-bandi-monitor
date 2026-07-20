@@ -26,7 +26,6 @@ function calcolaGiorniAllaScadenza(scadenza: string, oggi: Date): number {
 
 export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
   const eVisto = bando.stato === 'visto';
-  const eAlta = bando.priorita === 'alta';
   const giorniAllaScadenza = bando.scadenza ? calcolaGiorniAllaScadenza(bando.scadenza, new Date()) : null;
   const eInAllarme = giorniAllaScadenza !== null && giorniAllaScadenza < SOGLIA_GIORNI_ALLARME;
 
@@ -42,8 +41,8 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
                   label={parola}
                   size="small"
                   sx={{
-                    bgcolor: eAlta ? 'secondary.container' : 'info.container',
-                    color: eAlta ? 'secondary.onContainer' : 'info.onContainer',
+                    bgcolor: 'secondary.container',
+                    color: 'secondary.onContainer',
                     fontWeight: 600,
                   }}
                 />

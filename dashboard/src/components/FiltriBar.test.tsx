@@ -24,6 +24,7 @@ function renderFiltriBar(props: Partial<ComponentProps<typeof FiltriBar>> = {}) 
       filtri={filtriBase}
       fontiDisponibili={['eit']}
       paroleChiaveDisponibili={paroleChiaveEsempio}
+      numeroRisultati={5}
       onCambiaFiltri={vi.fn()}
       onParolaChiaveCliccata={vi.fn()}
       {...props}
@@ -103,5 +104,15 @@ describe('FiltriBar', () => {
 
     await utente.click(screen.getByLabelText(/inverti direzione ordinamento/i));
     expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, direzioneOrdinamento: 'crescente' });
+  });
+
+  it('mostra accanto a "Parole chiave" il numero di bandi trovati con la selezione attuale, non il numero di parole selezionate', () => {
+    renderFiltriBar({ filtri: { ...filtriBase, paroleChiave: ['gaming', 'startup'] }, numeroRisultati: 7 });
+    expect(screen.getByText('Parole chiave (7 bandi)')).toBeInTheDocument();
+  });
+
+  it('usa il singolare quando il risultato è un solo bando', () => {
+    renderFiltriBar({ numeroRisultati: 1 });
+    expect(screen.getByText('Parole chiave (1 bando)')).toBeInTheDocument();
   });
 });

@@ -24,6 +24,7 @@ export interface FiltriBarProps {
   filtri: FiltriStato;
   fontiDisponibili: string[];
   paroleChiaveDisponibili: ParolaChiave[];
+  numeroRisultati: number;
   onCambiaFiltri: (filtri: FiltriStato) => void;
   onParolaChiaveCliccata: (id: string) => void;
 }
@@ -32,6 +33,7 @@ export function FiltriBar({
   filtri,
   fontiDisponibili,
   paroleChiaveDisponibili,
+  numeroRisultati,
   onCambiaFiltri,
   onParolaChiaveCliccata,
 }: FiltriBarProps) {
@@ -140,7 +142,7 @@ export function FiltriBar({
           }}
         >
           <Typography variant="body2">
-            Parole chiave{filtri.paroleChiave.length > 0 ? ` (${filtri.paroleChiave.length})` : ''}
+            Parole chiave ({numeroRisultati} {numeroRisultati === 1 ? 'bando' : 'bandi'})
           </Typography>
           <ExpandMoreIcon
             fontSize="small"

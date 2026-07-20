@@ -89,6 +89,7 @@ export function ListaBandi() {
         filtri={filtri}
         fontiDisponibili={FONTI_ATTIVE}
         paroleChiaveDisponibili={paroleChiaveDisponibili}
+        numeroRisultati={bandiFiltrati.length}
         onCambiaFiltri={onCambiaFiltri}
         onParolaChiaveCliccata={incrementaContatoreParola}
       />
