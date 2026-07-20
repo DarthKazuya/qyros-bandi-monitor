@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import type { Bando } from '../lib/types';
 import { BandoCard } from './BandoCard';
 import { FiltriBar, type FiltriBarProps } from './FiltriBar';
+import { SuggerisciParolaChiave } from './SuggerisciParolaChiave';
 import { applicaFiltri, type FiltriStato } from '../lib/filtriBandi';
 import { FONTI_ATTIVE } from '../lib/sources';
 import { caricaFiltriSalvati, salvaFiltri } from '../lib/persistenzaFiltri';
@@ -84,6 +85,7 @@ export function ListaBandi() {
         conteggiPriorita={conteggiPriorita}
         onCambiaFiltri={onCambiaFiltri}
       />
+      <SuggerisciParolaChiave />
 
       {errore && (
         <Typography color="error" sx={{ mt: 2 }}>

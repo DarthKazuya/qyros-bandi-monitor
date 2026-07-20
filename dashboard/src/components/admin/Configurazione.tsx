@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Alert, Box, Button, Chip, CircularProgress, MenuItem, Select, TextField, Typography } from '@mui/material';
 import { supabase } from '../../lib/supabase';
-import type { ImpostazioniJob, ParolaChiave } from '../../lib/types';
+import type { ImpostazioniJob, ParolaChiave, SuggerimentoParolaChiave } from '../../lib/types';
 
 export function Configurazione() {
   const [paroleChiave, setParoleChiave] = useState<ParolaChiave[]>([]);
@@ -12,6 +12,8 @@ export function Configurazione() {
   const [nuovoLivello, setNuovoLivello] = useState<'livello1' | 'livello2'>('livello2');
   const [oraModificata, setOraModificata] = useState<number>(8);
   const [salvataggioOraInCorso, setSalvataggioOraInCorso] = useState(false);
+  const [suggerimenti, setSuggerimenti] = useState<SuggerimentoParolaChiave[]>([]);
+  const [azioneSuggerimentoInCorso, setAzioneSuggerimentoInCorso] = useState<string | null>(null);
 
   useEffect(() => {
     carica();
@@ -20,9 +22,14 @@ export function Configurazione() {
   async function carica() {
     setCaricamento(true);
     try {
-      const [risultatoParole, risultatoImpostazioni] = await Promise.all([
+      const [risultatoParole, risultatoImpostazioni, risultatoSuggerimenti] = await Promise.all([
         supabase.from('parole_chiave').select('id, parola, livello').order('parola'),
         supabase.from('impostazioni_job').select('id, ora, fuso_orario').eq('id', 1).single(),
+        supabase
+          .from('suggerimenti_parole_chiave')
+          .select('id, parola, proposto_da, proposto_il, stato')
+          .eq('stato', 'in_attesa')
+          .order('proposto_il'),
       ]);
 
       if (risultatoParole.error) {
@@ -37,6 +44,12 @@ export function Configurazione() {
         const impostazioniLette = risultatoImpostazioni.data as ImpostazioniJob;
         setImpostazioni(impostazioniLette);
         setOraModificata(impostazioniLette.ora);
+      }
+
+      if (risultatoSuggerimenti.error) {
+        setErrore(risultatoSuggerimenti.error.message);
+      } else {
+        setSuggerimenti((risultatoSuggerimenti.data ?? []) as SuggerimentoParolaChiave[]);
       }
     } catch (err) {
       setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');
@@ -71,6 +84,49 @@ export function Configurazione() {
     setParoleChiave((precedenti) => precedenti.filter((p) => p.id !== parola.id));
   }
 
+  async function accettaSuggerimento(suggerimento: SuggerimentoParolaChiave) {
+    setErrore(null);
+    setAzioneSuggerimentoInCorso(suggerimento.id);
+    const { data: nuovaParola, error: erroreInserimento } = await supabase
+      .from('parole_chiave')
+      .insert({ parola: suggerimento.parola, livello: 'livello2' })
+      .select('id, parola, livello')
+      .single();
+    if (erroreInserimento) {
+      setErrore(erroreInserimento.message);
+      setAzioneSuggerimentoInCorso(null);
+      return;
+    }
+    const { error: erroreStato } = await supabase
+      .from('suggerimenti_parole_chiave')
+      .update({ stato: 'accettato' })
+      .eq('id', suggerimento.id);
+    if (erroreStato) {
+      setErrore(erroreStato.message);
+      setAzioneSuggerimentoInCorso(null);
+      return;
+    }
+    setParoleChiave((precedenti) => [...precedenti, nuovaParola as ParolaChiave]);
+    setSuggerimenti((precedenti) => precedenti.filter((s) => s.id !== suggerimento.id));
+    setAzioneSuggerimentoInCorso(null);
+  }
+
+  async function rifiutaSuggerimento(suggerimento: SuggerimentoParolaChiave) {
+    setErrore(null);
+    setAzioneSuggerimentoInCorso(suggerimento.id);
+    const { error } = await supabase
+      .from('suggerimenti_parole_chiave')
+      .update({ stato: 'rifiutato' })
+      .eq('id', suggerimento.id);
+    if (error) {
+      setErrore(error.message);
+      setAzioneSuggerimentoInCorso(null);
+      return;
+    }
+    setSuggerimenti((precedenti) => precedenti.filter((s) => s.id !== suggerimento.id));
+    setAzioneSuggerimentoInCorso(null);
+  }
+
   async function salvaOra() {
     setErrore(null);
     setSalvataggioOraInCorso(true);
@@ -97,6 +153,52 @@ export function Configurazione() {
         <Alert severity="error" sx={{ mb: 2 }}>
           {errore}
         </Alert>
+      )}
+
+      <Typography variant="h6" sx={{ mb: 1 }}>
+        Suggerimenti in attesa
+      </Typography>
+      {suggerimenti.length === 0 ? (
+        <Typography color="text.secondary" sx={{ mb: 3 }}>
+          Nessun suggerimento in attesa.
+        </Typography>
+      ) : (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, mb: 3 }}>
+          {suggerimenti.map((suggerimento) => (
+            <Box
+              key={suggerimento.id}
+              sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 1.5, border: '1px solid', borderColor: 'divider', borderRadius: 2 }}
+            >
+              <Box>
+                <Typography>{suggerimento.parola}</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  proposto da {suggerimento.proposto_da}
+                </Typography>
+              </Box>
+              <Box sx={{ display: 'flex', gap: 1 }}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  disabled={azioneSuggerimentoInCorso === suggerimento.id}
+                  onClick={() => accettaSuggerimento(suggerimento)}
+                  sx={{ minHeight: 44 }}
+                >
+                  Accetta
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  size="small"
+                  disabled={azioneSuggerimentoInCorso === suggerimento.id}
+                  onClick={() => rifiutaSuggerimento(suggerimento)}
+                  sx={{ minHeight: 44 }}
+                >
+                  Rifiuta
+                </Button>
+              </Box>
+            </Box>
+          ))}
+        </Box>
       )}
 
       <Typography variant="h6" sx={{ mb: 1 }}>

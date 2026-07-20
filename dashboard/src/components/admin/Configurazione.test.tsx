@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import type { ImpostazioniJob, ParolaChiave } from '../../lib/types';
+import type { ImpostazioniJob, ParolaChiave, SuggerimentoParolaChiave } from '../../lib/types';
 
 let paroleFinte: ParolaChiave[] = [];
 let impostazioniFinte: ImpostazioniJob | null = null;
+let suggerimentiFinti: SuggerimentoParolaChiave[] = [];
 const inserisciFinto = vi.fn(async (valori: Partial<ParolaChiave>) => ({
   data: { id: '99', ...valori },
   error: null as { message: string } | null,
@@ -13,6 +14,9 @@ const eliminaFinto = vi.fn(async (colonna: string, valore: string) => ({
   error: null as { message: string } | null,
 }));
 const aggiornaOraFinto = vi.fn(async (valori: Partial<ImpostazioniJob>, colonna: string, valore: number) => ({
+  error: null as { message: string } | null,
+}));
+const aggiornaSuggerimentoFinto = vi.fn(async (valori: Partial<SuggerimentoParolaChiave>, colonna: string, valore: string) => ({
   error: null as { message: string } | null,
 }));
 
@@ -31,6 +35,18 @@ vi.mock('../../lib/supabase', () => ({
           }),
           delete: () => ({
             eq: (colonna: string, valore: string) => eliminaFinto(colonna, valore),
+          }),
+        };
+      }
+      if (tabella === 'suggerimenti_parole_chiave') {
+        return {
+          select: () => ({
+            eq: () => ({
+              order: async () => ({ data: suggerimentiFinti, error: null }),
+            }),
+          }),
+          update: (valori: Partial<SuggerimentoParolaChiave>) => ({
+            eq: (colonna: string, valore: string) => aggiornaSuggerimentoFinto(valori, colonna, valore),
           }),
         };
       }
@@ -55,11 +71,13 @@ describe('Configurazione', () => {
     inserisciFinto.mockClear();
     eliminaFinto.mockClear();
     aggiornaOraFinto.mockClear();
+    aggiornaSuggerimentoFinto.mockClear();
     paroleFinte = [
       { id: '1', parola: 'gaming', livello: 'livello1' },
       { id: '2', parola: 'startup', livello: 'livello2' },
     ];
     impostazioniFinte = { id: 1, ora: 8, fuso_orario: 'Europe/Rome' };
+    suggerimentiFinti = [];
   });
 
   it('mostra le parole chiave raggruppate per livello', async () => {
@@ -107,5 +125,53 @@ describe('Configurazione', () => {
     await utente.click(screen.getByRole('button', { name: 'Salva' }));
 
     await waitFor(() => expect(aggiornaOraFinto).toHaveBeenCalledWith({ ora: 9 }, 'id', 1));
+  });
+
+  it('mostra i suggerimenti in attesa', async () => {
+    suggerimentiFinti = [
+      { id: 's1', parola: 'blockchain', proposto_da: 'mario.rossi@esempio.it', proposto_il: '2026-07-20T10:00:00Z', stato: 'in_attesa' },
+    ];
+    render(<Configurazione />);
+    await waitFor(() => expect(screen.getByText('blockchain')).toBeInTheDocument());
+    expect(screen.getByText(/mario.rossi@esempio.it/)).toBeInTheDocument();
+  });
+
+  it('accettando un suggerimento lo aggiunge alle parole chiave e lo rimuove dall\'elenco', async () => {
+    suggerimentiFinti = [
+      { id: 's1', parola: 'blockchain', proposto_da: 'mario.rossi@esempio.it', proposto_il: '2026-07-20T10:00:00Z', stato: 'in_attesa' },
+    ];
+    const utente = userEvent.setup();
+    render(<Configurazione />);
+    await waitFor(() => expect(screen.getByText('blockchain')).toBeInTheDocument());
+
+    await utente.click(screen.getByRole('button', { name: 'Accetta' }));
+
+    await waitFor(() => expect(inserisciFinto).toHaveBeenCalledWith({ parola: 'blockchain', livello: 'livello2' }));
+    await waitFor(() =>
+      expect(aggiornaSuggerimentoFinto).toHaveBeenCalledWith({ stato: 'accettato' }, 'id', 's1')
+    );
+    await waitFor(() => expect(screen.queryByText(/proposto da/)).not.toBeInTheDocument());
+  });
+
+  it('rifiutando un suggerimento aggiorna solo il suo stato', async () => {
+    suggerimentiFinti = [
+      { id: 's1', parola: 'blockchain', proposto_da: 'mario.rossi@esempio.it', proposto_il: '2026-07-20T10:00:00Z', stato: 'in_attesa' },
+    ];
+    const utente = userEvent.setup();
+    render(<Configurazione />);
+    await waitFor(() => expect(screen.getByText('blockchain')).toBeInTheDocument());
+
+    await utente.click(screen.getByRole('button', { name: 'Rifiuta' }));
+
+    await waitFor(() =>
+      expect(aggiornaSuggerimentoFinto).toHaveBeenCalledWith({ stato: 'rifiutato' }, 'id', 's1')
+    );
+    expect(inserisciFinto).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.queryByText('blockchain')).not.toBeInTheDocument());
+  });
+
+  it('mostra un messaggio quando non ci sono suggerimenti in attesa', async () => {
+    render(<Configurazione />);
+    await waitFor(() => expect(screen.getByText('Nessun suggerimento in attesa.')).toBeInTheDocument());
   });
 });

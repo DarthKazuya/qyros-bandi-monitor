@@ -49,6 +49,14 @@ export interface ParolaChiave {
   livello: 'livello1' | 'livello2';
 }
 
+export interface SuggerimentoParolaChiave {
+  id: string;
+  parola: string;
+  proposto_da: string;
+  proposto_il: string;
+  stato: 'in_attesa' | 'accettato' | 'rifiutato';
+}
+
 export interface ImpostazioniJob {
   id: number;
   ora: number;
