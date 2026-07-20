@@ -75,7 +75,7 @@ describe('creaDbPortSupabase', () => {
     const { client, buildersCreati } = creaClienteFinto({ bandi: { error: null } });
     const db = creaDbPortSupabase(client);
 
-    await db.inserisciBando(creaBando(), 'alta', false);
+    await db.inserisciBando(creaBando(), 'alta', false, ['gaming']);
 
     expect(buildersCreati.bandi.ultimoInsert).toMatchObject({
       fonte: 'eit',
@@ -84,6 +84,7 @@ describe('creaDbPortSupabase', () => {
       priorita: 'alta',
       scartato: false,
       hash_contenuto: 'abc123',
+      parole_corrispondenti: ['gaming'],
     });
   });
 
@@ -91,7 +92,7 @@ describe('creaDbPortSupabase', () => {
     const { client } = creaClienteFinto({ bandi: { error: { message: 'connessione rifiutata' } } });
     const db = creaDbPortSupabase(client);
 
-    await expect(db.inserisciBando(creaBando(), 'alta', false)).rejects.toThrow('connessione rifiutata');
+    await expect(db.inserisciBando(creaBando(), 'alta', false, ['gaming'])).rejects.toThrow('connessione rifiutata');
   });
 
   it('registraEsitoJob invia fonti_ok, fonti_fallite e nuovi_bandi alla tabella job_run_log', async () => {

@@ -5,6 +5,7 @@ export interface BandoSalvato {
   bando: BandoRaw;
   priorita: Priorita | null;
   scartato: boolean;
+  paroleTrovate: string[];
 }
 
 export interface DbPortFake {
@@ -24,8 +25,8 @@ export function creaDbPortFake(): DbPortFake {
     async trovaEsistente(fonte, url) {
       return esistenti.get(`${fonte}::${url}`) ?? null;
     },
-    async inserisciBando(bando, priorita, scartato) {
-      salvati.push({ bando, priorita, scartato });
+    async inserisciBando(bando, priorita, scartato, paroleTrovate) {
+      salvati.push({ bando, priorita, scartato, paroleTrovate });
       esistenti.set(`${bando.fonte}::${bando.url}`, { hash_contenuto: bando.hash_contenuto });
     },
     async aggiornaBando(fonte, url, bando) {

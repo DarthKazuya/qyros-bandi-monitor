@@ -25,7 +25,7 @@ function creaBando(overrides: Partial<BandoRaw> = {}): BandoRaw {
 }
 
 describe('eseguiRaccolta', () => {
-  it('salva un nuovo bando rilevante e lo segnala tra i nuovi match', async () => {
+  it('salva un nuovo bando rilevante, con le parole trovate, e lo segnala tra i nuovi match', async () => {
     const stato = creaDbPortFake();
     const scraperOk: Scraper = { id: 'fonte-test', scrape: async () => [creaBando()] };
 
@@ -33,6 +33,7 @@ describe('eseguiRaccolta', () => {
 
     expect(stato.salvati).toHaveLength(1);
     expect(stato.salvati[0].priorita).toBe('alta');
+    expect(stato.salvati[0].paroleTrovate).toEqual(['gaming']);
     expect(risultato.nuoviBandiRilevanti).toHaveLength(1);
     expect(risultato.fontiOk).toEqual(['fonte-test']);
     expect(risultato.fontiFallite).toEqual([]);

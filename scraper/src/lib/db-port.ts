@@ -7,7 +7,7 @@ export interface FonteFallita {
 
 export interface DbPort {
   trovaEsistente(fonte: string, url: string): Promise<EsistenteBando | null>;
-  inserisciBando(bando: BandoRaw, priorita: Priorita | null, scartato: boolean): Promise<void>;
+  inserisciBando(bando: BandoRaw, priorita: Priorita | null, scartato: boolean, paroleTrovate: string[]): Promise<void>;
   aggiornaBando(fonte: string, url: string, bando: BandoRaw): Promise<void>;
   registraEsitoJob(fontiOk: string[], fontiFallite: FonteFallita[], nuoviBandi: number): Promise<void>;
 }

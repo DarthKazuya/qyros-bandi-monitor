@@ -31,8 +31,8 @@ export async function eseguiRaccolta(scrapers: Scraper[], keywords: Keywords, db
           continue;
         }
 
-        const { priorita, scartato } = classifica(bando.titolo, bando.descrizione, keywords);
-        await db.inserisciBando(bando, priorita, scartato);
+        const { priorita, scartato, paroleTrovate } = classifica(bando.titolo, bando.descrizione, keywords);
+        await db.inserisciBando(bando, priorita, scartato, paroleTrovate);
         if (!scartato && priorita) {
           nuoviBandiRilevanti.push({ bando, priorita });
         }

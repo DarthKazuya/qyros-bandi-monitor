@@ -24,7 +24,7 @@ export function creaDbPortSupabase(client: SupabaseClient): DbPort {
       return data ? { hash_contenuto: (data as { hash_contenuto: string }).hash_contenuto } : null;
     },
 
-    async inserisciBando(bando: BandoRaw, priorita: Priorita | null, scartato: boolean): Promise<void> {
+    async inserisciBando(bando: BandoRaw, priorita: Priorita | null, scartato: boolean, paroleTrovate: string[]): Promise<void> {
       const { error } = await client.from('bandi').insert({
         fonte: bando.fonte,
         titolo: bando.titolo,
@@ -35,6 +35,7 @@ export function creaDbPortSupabase(client: SupabaseClient): DbPort {
         hash_contenuto: bando.hash_contenuto,
         priorita,
         scartato,
+        parole_corrispondenti: paroleTrovate,
       });
       if (error) throw new Error(`Supabase inserisciBando: ${error.message}`);
     },
