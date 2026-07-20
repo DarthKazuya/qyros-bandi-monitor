@@ -44,6 +44,11 @@ describe('BandoCard', () => {
     expect(screen.queryByText('Da verificare')).not.toBeInTheDocument();
   });
 
+  it('non mostra alcun badge quando non ci sono parole corrispondenti', () => {
+    render(<BandoCard bando={creaBando({ parole_corrispondenti: [] })} onCambiaStato={vi.fn()} />);
+    expect(screen.queryByText(/Corrisponde a/)).not.toBeInTheDocument();
+  });
+
   it('mostra titolo, fonte e scadenza formattata in italiano', () => {
     render(<BandoCard bando={creaBando({ titolo: 'Bando gaming 2026', fonte: 'eit', scadenza: '2026-12-31' })} onCambiaStato={vi.fn()} />);
     expect(screen.getByText('Bando gaming 2026')).toBeInTheDocument();
