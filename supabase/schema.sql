@@ -216,3 +216,9 @@ as $$
 $$;
 
 grant execute on function increment_click_parola(uuid) to authenticated;
+
+-- Tidiness/hardening: Postgres concede EXECUTE a PUBLIC di default sulle
+-- nuove funzioni. Non è uno sfruttabile reale qui (anon non può leggere
+-- parole_chiave per scoprire id validi, e la funzione incrementa solo un
+-- contatore non sensibile), ma restringiamo comunque all'intento esplicito.
+revoke all on function increment_click_parola(uuid) from public;
