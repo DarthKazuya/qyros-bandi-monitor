@@ -141,4 +141,11 @@ describe('App', () => {
     expect(screen.getByText('Pannello admin')).toBeInTheDocument();
     expect(screen.queryByText('Lista bandi')).not.toBeInTheDocument();
   });
+
+  it('usa il colore primario (indaco) per l\'intestazione', () => {
+    vi.mocked(useAuth).mockReturnValue({ sessione: null, caricamento: false });
+    render(<App />);
+    const appBar = document.querySelector('.MuiAppBar-root');
+    expect(appBar).toHaveStyle({ backgroundColor: 'rgb(122, 138, 240)' });
+  });
 });

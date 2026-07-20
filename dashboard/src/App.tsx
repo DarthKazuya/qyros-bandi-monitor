@@ -34,13 +34,13 @@ function App() {
   return (
     <ThemeProvider theme={tema}>
       <CssBaseline />
-      <AppBar position="sticky" color="secondary" elevation={0}>
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+      <AppBar position="sticky" color="primary" enableColorOnDark elevation={0} sx={{ bgcolor: 'primary.main' }}>
+        <Toolbar sx={{ gap: { xs: 0.5, sm: 1 } }}>
+          <Typography variant="h6" component="div" noWrap sx={{ flexGrow: 1 }}>
             Fund Radar
           </Typography>
           {utenteEAmministratore && (
-            <Button color="inherit" onClick={() => setVistaAdmin((v) => !v)} sx={{ minHeight: 44, mr: 1 }}>
+            <Button color="inherit" onClick={() => setVistaAdmin((v) => !v)} sx={{ minHeight: 44 }}>
               {vistaAdmin ? 'Bandi' : 'Pannello'}
             </Button>
           )}
