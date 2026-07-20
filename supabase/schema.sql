@@ -146,3 +146,10 @@ on conflict (parola, livello) do nothing;
 
 insert into impostazioni_job (id, ora, fuso_orario) values (1, 8, 'Europe/Rome')
 on conflict (id) do nothing;
+
+-- Una tantum (2026-07-20, Fase 6d): l'amministratore predata la Fase 6d, quindi
+-- non ha nome/cognome in user_metadata come i futuri utenti approvati. Merge
+-- additivo per non toccare le altre chiavi già presenti (sub, email_verified...).
+update auth.users
+set raw_user_meta_data = raw_user_meta_data || '{"nome":"Luca","cognome":"Panto"}'::jsonb
+where email = 'panto75@gmail.com';
