@@ -71,7 +71,7 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
             sx={{
               mt: 1,
               bgcolor: eInAllarme ? 'warning.main' : 'action.selected',
-              color: eInAllarme ? '#ffffff' : 'text.primary',
+              color: eInAllarme ? 'rgba(0,0,0,0.87)' : 'text.primary',
             }}
           />
         )}
