@@ -1,7 +1,6 @@
-import type { Bando, Priorita } from './types';
+import type { Bando } from './types';
 
 export interface FiltriStato {
-  priorita: Priorita | 'tutti';
   fonti: string[];
   paroleChiave: string[];
   ricerca: string;
@@ -18,10 +17,6 @@ function confrontaConNullInFondo(valoreA: string | null, valoreB: string | null,
 
 export function applicaFiltri(bandi: Bando[], filtri: FiltriStato): Bando[] {
   let risultato = bandi;
-
-  if (filtri.priorita !== 'tutti') {
-    risultato = risultato.filter((b) => b.priorita === filtri.priorita);
-  }
 
   if (filtri.fonti.length > 0) {
     risultato = risultato.filter((b) => filtri.fonti.includes(b.fonte));

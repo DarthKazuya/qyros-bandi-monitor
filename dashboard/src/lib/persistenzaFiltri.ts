@@ -2,7 +2,6 @@ import type { FiltriStato } from './filtriBandi';
 
 export const CHIAVE_LOCALSTORAGE = 'qyros-dashboard-filtri';
 
-const PRIORITA_VALIDE = ['tutti', 'alta', 'da_verificare'];
 const ORDINAMENTI_VALIDI = ['data_pubblicazione', 'scadenza'];
 const DIREZIONI_VALIDE = ['crescente', 'decrescente'];
 
@@ -11,8 +10,6 @@ function eFiltriStatoValido(valore: unknown): valore is FiltriStato {
   const v = valore as Record<string, unknown>;
 
   return (
-    typeof v.priorita === 'string' &&
-    PRIORITA_VALIDE.includes(v.priorita) &&
     Array.isArray(v.fonti) &&
     v.fonti.every((f) => typeof f === 'string') &&
     Array.isArray(v.paroleChiave) &&

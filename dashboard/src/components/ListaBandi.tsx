@@ -10,7 +10,6 @@ import { FONTI_ATTIVE } from '../lib/sources';
 import { caricaFiltriSalvati, salvaFiltri } from '../lib/persistenzaFiltri';
 
 const FILTRI_DEFAULT: FiltriStato = {
-  priorita: 'tutti',
   fonti: [],
   paroleChiave: [],
   ricerca: '',
@@ -71,15 +70,6 @@ export function ListaBandi() {
 
   const bandiFiltrati = useMemo(() => applicaFiltri(bandi, filtri), [bandi, filtri]);
 
-  const conteggiPriorita = useMemo(() => {
-    const senzaPriorita = applicaFiltri(bandi, { ...filtri, priorita: 'tutti' });
-    return {
-      tutti: senzaPriorita.length,
-      alta: senzaPriorita.filter((b) => b.priorita === 'alta').length,
-      da_verificare: senzaPriorita.filter((b) => b.priorita === 'da_verificare').length,
-    };
-  }, [bandi, filtri]);
-
   const onCambiaFiltri: FiltriBarProps['onCambiaFiltri'] = (nuoviFiltri) => {
     setFiltri(nuoviFiltri);
     salvaFiltri(nuoviFiltri);
@@ -98,7 +88,6 @@ export function ListaBandi() {
       <FiltriBar
         filtri={filtri}
         fontiDisponibili={FONTI_ATTIVE}
-        conteggiPriorita={conteggiPriorita}
         paroleChiaveDisponibili={paroleChiaveDisponibili}
         onCambiaFiltri={onCambiaFiltri}
         onParolaChiaveCliccata={incrementaContatoreParola}

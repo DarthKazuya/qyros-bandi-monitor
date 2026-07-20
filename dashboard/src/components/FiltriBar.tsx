@@ -10,8 +10,6 @@ import {
   MenuItem,
   Select,
   TextField,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
   Checkbox,
   type SelectChangeEvent,
@@ -25,7 +23,6 @@ import type { ParolaChiave } from '../lib/types';
 export interface FiltriBarProps {
   filtri: FiltriStato;
   fontiDisponibili: string[];
-  conteggiPriorita: { tutti: number; alta: number; da_verificare: number };
   paroleChiaveDisponibili: ParolaChiave[];
   onCambiaFiltri: (filtri: FiltriStato) => void;
   onParolaChiaveCliccata: (id: string) => void;
@@ -34,7 +31,6 @@ export interface FiltriBarProps {
 export function FiltriBar({
   filtri,
   fontiDisponibili,
-  conteggiPriorita,
   paroleChiaveDisponibili,
   onCambiaFiltri,
   onParolaChiaveCliccata,
@@ -81,24 +77,6 @@ export function FiltriBar({
         fullWidth
         size="small"
       />
-
-      <ToggleButtonGroup
-        value={filtri.priorita}
-        exclusive
-        onChange={(_e, valore) => valore && onCambiaFiltri({ ...filtri, priorita: valore })}
-        size="small"
-        sx={{ flexWrap: 'wrap' }}
-      >
-        <ToggleButton value="tutti" sx={{ minHeight: 44 }}>
-          Tutti ({conteggiPriorita.tutti})
-        </ToggleButton>
-        <ToggleButton value="alta" sx={{ minHeight: 44 }}>
-          Match diretto ({conteggiPriorita.alta})
-        </ToggleButton>
-        <ToggleButton value="da_verificare" sx={{ minHeight: 44 }}>
-          Da verificare ({conteggiPriorita.da_verificare})
-        </ToggleButton>
-      </ToggleButtonGroup>
 
       <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, flexWrap: 'wrap' }}>
         <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: 1 }}>

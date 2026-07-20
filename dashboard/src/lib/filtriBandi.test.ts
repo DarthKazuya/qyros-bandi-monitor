@@ -19,7 +19,6 @@ function creaBando(overrides: Partial<Bando> = {}): Bando {
 }
 
 const filtriBase: FiltriStato = {
-  priorita: 'tutti',
   fonti: [],
   paroleChiave: [],
   ricerca: '',
@@ -31,12 +30,6 @@ describe('applicaFiltri', () => {
   it('non filtra nulla con i filtri di default', () => {
     const bandi = [creaBando({ id: '1' }), creaBando({ id: '2' })];
     expect(applicaFiltri(bandi, filtriBase).map((b) => b.id)).toEqual(['1', '2']);
-  });
-
-  it('filtra per priorita alta', () => {
-    const bandi = [creaBando({ id: '1', priorita: 'alta' }), creaBando({ id: '2', priorita: 'da_verificare' })];
-    const risultato = applicaFiltri(bandi, { ...filtriBase, priorita: 'alta' });
-    expect(risultato.map((b) => b.id)).toEqual(['1']);
   });
 
   it('filtra per una o più fonti selezionate (multi-select)', () => {
@@ -85,11 +78,11 @@ describe('applicaFiltri', () => {
 
   it('combina più filtri insieme', () => {
     const bandi = [
-      creaBando({ id: '1', fonte: 'eit', priorita: 'alta', titolo: 'Bando gaming' }),
-      creaBando({ id: '2', fonte: 'eit', priorita: 'da_verificare', titolo: 'Bando gaming' }),
-      creaBando({ id: '3', fonte: 'invitalia', priorita: 'alta', titolo: 'Bando gaming' }),
+      creaBando({ id: '1', fonte: 'eit', parole_corrispondenti: ['gaming'] }),
+      creaBando({ id: '2', fonte: 'eit', parole_corrispondenti: ['fintech'] }),
+      creaBando({ id: '3', fonte: 'invitalia', parole_corrispondenti: ['gaming'] }),
     ];
-    const risultato = applicaFiltri(bandi, { ...filtriBase, priorita: 'alta', fonti: ['eit'] });
+    const risultato = applicaFiltri(bandi, { ...filtriBase, paroleChiave: ['gaming'], fonti: ['eit'] });
     expect(risultato.map((b) => b.id)).toEqual(['1']);
   });
 });

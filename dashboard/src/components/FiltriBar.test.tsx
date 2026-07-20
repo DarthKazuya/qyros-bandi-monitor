@@ -7,7 +7,6 @@ import type { FiltriStato } from '../lib/filtriBandi';
 import type { ParolaChiave } from '../lib/types';
 
 const filtriBase: FiltriStato = {
-  priorita: 'tutti',
   fonti: [],
   paroleChiave: [],
   ricerca: '',
@@ -15,7 +14,6 @@ const filtriBase: FiltriStato = {
   direzioneOrdinamento: 'decrescente',
 };
 
-const conteggiEsempio = { tutti: 5, alta: 2, da_verificare: 3 };
 const paroleChiaveEsempio: ParolaChiave[] = [
   { id: 'p1', parola: 'gaming', livello: 'livello1', contatore_click: 0 },
 ];
@@ -25,7 +23,6 @@ function renderFiltriBar(props: Partial<ComponentProps<typeof FiltriBar>> = {}) 
     <FiltriBar
       filtri={filtriBase}
       fontiDisponibili={['eit']}
-      conteggiPriorita={conteggiEsempio}
       paroleChiaveDisponibili={paroleChiaveEsempio}
       onCambiaFiltri={vi.fn()}
       onParolaChiaveCliccata={vi.fn()}
@@ -42,15 +39,6 @@ describe('FiltriBar', () => {
 
     await utente.type(screen.getByPlaceholderText(/cerca per titolo/i), 'g');
     expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, ricerca: 'g' });
-  });
-
-  it('chiama onCambiaFiltri quando si seleziona "Match diretto"', async () => {
-    const utente = userEvent.setup();
-    const onCambiaFiltri = vi.fn();
-    renderFiltriBar({ onCambiaFiltri });
-
-    await utente.click(screen.getByRole('button', { name: /match diretto/i }));
-    expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, priorita: 'alta' });
   });
 
   it('permette di selezionare più fonti (multi-select)', async () => {
@@ -115,12 +103,5 @@ describe('FiltriBar', () => {
 
     await utente.click(screen.getByLabelText(/inverti direzione ordinamento/i));
     expect(onCambiaFiltri).toHaveBeenCalledWith({ ...filtriBase, direzioneOrdinamento: 'crescente' });
-  });
-
-  it('mostra i contatori sulle schede di priorità', () => {
-    renderFiltriBar();
-    expect(screen.getByRole('button', { name: /tutti \(5\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /match diretto \(2\)/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /da verificare \(3\)/i })).toBeInTheDocument();
   });
 });

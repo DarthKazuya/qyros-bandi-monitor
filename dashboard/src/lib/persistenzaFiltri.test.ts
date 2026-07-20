@@ -3,7 +3,6 @@ import { CHIAVE_LOCALSTORAGE, caricaFiltriSalvati, salvaFiltri } from './persist
 import type { FiltriStato } from './filtriBandi';
 
 const filtriEsempio: FiltriStato = {
-  priorita: 'alta',
   fonti: ['eit'],
   paroleChiave: ['gaming'],
   ricerca: 'test',

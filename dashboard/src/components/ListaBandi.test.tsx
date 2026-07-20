@@ -105,15 +105,17 @@ describe('ListaBandi — fonti e persistenza', () => {
     localStorage.setItem(
       'qyros-dashboard-filtri',
       JSON.stringify({
-        priorita: 'alta',
-        fonti: [],
+        fonti: ['eit'],
         paroleChiave: [],
         ricerca: '',
         ordinamento: 'data_pubblicazione',
         direzioneOrdinamento: 'decrescente',
       })
     );
-    datiFinti = [creaBando({ id: '1', titolo: 'Bando A', priorita: 'alta' }), creaBando({ id: '2', titolo: 'Bando B', priorita: 'da_verificare' })];
+    datiFinti = [
+      creaBando({ id: '1', titolo: 'Bando A', fonte: 'eit' }),
+      creaBando({ id: '2', titolo: 'Bando B', fonte: 'invitalia' }),
+    ];
 
     render(<ListaBandi />);
     await waitFor(() => expect(screen.getByText('Bando A')).toBeInTheDocument());
@@ -126,9 +128,9 @@ describe('ListaBandi — fonti e persistenza', () => {
     await waitFor(() => expect(screen.getByText('Bando A')).toBeInTheDocument());
 
     const utente = userEvent.setup();
-    await utente.click(screen.getByRole('button', { name: /match diretto/i }));
+    await utente.click(screen.getByLabelText(/inverti direzione ordinamento/i));
 
     const salvato = JSON.parse(localStorage.getItem('qyros-dashboard-filtri') ?? '{}');
-    expect(salvato.priorita).toBe('alta');
+    expect(salvato.direzioneOrdinamento).toBe('crescente');
   });
 });
