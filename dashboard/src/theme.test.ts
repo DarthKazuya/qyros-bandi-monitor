@@ -2,17 +2,56 @@ import { describe, expect, it } from 'vitest';
 import { creaTemaQyros } from './theme';
 
 describe('creaTemaQyros', () => {
-  it('usa il colore arancione QYROS come primario in entrambe le modalità', () => {
-    expect(creaTemaQyros('dark').palette.primary.main).toBe('#ff6500');
-    expect(creaTemaQyros('light').palette.primary.main).toBe('#ff6500');
+  it('usa la nuova palette primaria indaco in entrambe le modalità', () => {
+    expect(creaTemaQyros('light').palette.primary.main).toBe('#5B6EE8');
+    expect(creaTemaQyros('dark').palette.primary.main).toBe('#7A8AF0');
   });
 
-  it('usa il blu petrolio QYROS come secondario', () => {
-    expect(creaTemaQyros('dark').palette.secondary.main).toBe('#3c6a8b');
+  it('usa il teal come colore secondario, con i toni container per i badge', () => {
+    const chiaro = creaTemaQyros('light').palette.secondary;
+    expect(chiaro.main).toBe('#0F6E56');
+    expect(chiaro.container).toBe('#D2EFF0');
+    expect(chiaro.onContainer).toBe('#0F6E56');
+
+    const scuro = creaTemaQyros('dark').palette.secondary;
+    expect(scuro.main).toBe('#9FE1CB');
+    expect(scuro.container).toBe('#085041');
+    expect(scuro.onContainer).toBe('#9FE1CB');
   });
 
-  it('usa lo sfondo scuro QYROS in dark mode', () => {
-    expect(creaTemaQyros('dark').palette.background.default).toBe('#040a1b');
+  it('usa il grigio-blu come colore neutro (ruolo info) per i badge "da verificare"', () => {
+    const chiaro = creaTemaQyros('light').palette.info;
+    expect(chiaro.main).toBe('#78909C');
+    expect(chiaro.container).toBe('#ECEFF1');
+    expect(chiaro.onContainer).toBe('#37474F');
+
+    const scuro = creaTemaQyros('dark').palette.info;
+    expect(scuro.main).toBe('#78909C');
+    expect(scuro.container).toBe('#37474F');
+    expect(scuro.onContainer).toBe('#CFD8DC');
+  });
+
+  it('riserva il rosso esclusivamente al ruolo errore, in entrambe le modalità', () => {
+    expect(creaTemaQyros('light').palette.error.main).toBe('#D32F2F');
+    expect(creaTemaQyros('dark').palette.error.main).toBe('#D32F2F');
+  });
+
+  it('applica i colori personalizzati agli avvisi di errore (Alert standard)', () => {
+    const chiaro = creaTemaQyros('light').components?.MuiAlert?.styleOverrides
+      ?.standardError as Record<string, string>;
+    expect(chiaro).toMatchObject({ backgroundColor: '#FCEBEB', color: '#501313' });
+
+    const scuro = creaTemaQyros('dark').components?.MuiAlert?.styleOverrides
+      ?.standardError as Record<string, string>;
+    expect(scuro).toMatchObject({ backgroundColor: '#791F1F', color: '#F7C1C1' });
+  });
+
+  it('non usa mai il nero puro come sfondo pagina in dark mode', () => {
+    expect(creaTemaQyros('dark').palette.background.default).toBe('#111318');
+  });
+
+  it('usa uno sfondo card leggermente più chiaro dello sfondo pagina in dark mode', () => {
+    expect(creaTemaQyros('dark').palette.background.paper).toBe('#1a1d24');
   });
 
   it('imposta la modalità richiesta', () => {
