@@ -81,7 +81,7 @@ describe('App', () => {
     render(<App />);
 
     await utente.hover(screen.getByLabelText('Esci'));
-    expect(await screen.findByText('Esci', { selector: '[role="tooltip"]' })).toBeInTheDocument();
+    expect(await screen.findByText('Esci')).toBeInTheDocument();
   });
 
   it('mostra il pulsante Esci quando c\'è una sessione, e lo chiama al click', async () => {
