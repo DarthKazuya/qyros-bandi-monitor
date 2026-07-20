@@ -2,16 +2,35 @@ import { creaClienteSupabaseReale } from '../src/lib/db-port-supabase.js';
 import { caricaKeywords } from '../src/lib/config.js';
 import { classifica } from '../src/lib/matching.js';
 
+async function caricaTuttiIBandi(
+  client: ReturnType<typeof creaClienteSupabaseReale>
+): Promise<{ id: string; titolo: string; descrizione: string }[]> {
+  const DIMENSIONE_PAGINA = 1000;
+  const bandi: { id: string; titolo: string; descrizione: string }[] = [];
+  let offset = 0;
+
+  for (;;) {
+    const { data, error } = await client
+      .from('bandi')
+      .select('id, titolo, descrizione')
+      .range(offset, offset + DIMENSIONE_PAGINA - 1);
+    if (error) {
+      throw new Error(`Impossibile leggere i bandi: ${error.message}`);
+    }
+    const pagina = (data ?? []) as { id: string; titolo: string; descrizione: string }[];
+    bandi.push(...pagina);
+    if (pagina.length < DIMENSIONE_PAGINA) break;
+    offset += DIMENSIONE_PAGINA;
+  }
+
+  return bandi;
+}
+
 async function main() {
   const client = creaClienteSupabaseReale();
   const keywords = await caricaKeywords(client);
 
-  const { data, error } = await client.from('bandi').select('id, titolo, descrizione');
-  if (error) {
-    throw new Error(`Impossibile leggere i bandi: ${error.message}`);
-  }
-
-  const bandi = (data ?? []) as { id: string; titolo: string; descrizione: string }[];
+  const bandi = await caricaTuttiIBandi(client);
   let aggiornati = 0;
   let senzaCorrispondenza = 0;
 
