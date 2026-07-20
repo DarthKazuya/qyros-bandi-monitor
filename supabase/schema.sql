@@ -153,3 +153,8 @@ on conflict (id) do nothing;
 update auth.users
 set raw_user_meta_data = raw_user_meta_data || '{"nome":"Luca","cognome":"Panto"}'::jsonb
 where email = 'panto75@gmail.com';
+
+-- Fase 6e: colonna per le parole chiave che hanno causato la classificazione
+-- di ogni bando (invece di mostrare solo l'etichetta astratta "Match
+-- diretto"/"Da verificare" nella dashboard).
+alter table bandi add column if not exists parole_corrispondenti text[] not null default '{}';
