@@ -188,3 +188,18 @@ create policy "suggerimenti_admin_update" on suggerimenti_parole_chiave
 -- volte in questo progetto).
 grant select, insert, update on table public.suggerimenti_parole_chiave to authenticated;
 grant all on table public.suggerimenti_parole_chiave to service_role;
+
+-- Fase 6e: contatore di quante volte ogni parola chiave è stata usata come
+-- filtro, per aiutare a capire quali restano pertinenti.
+alter table parole_chiave add column if not exists contatore_click integer not null default 0;
+
+-- Incremento atomico lato database: evita che due click quasi simultanei si
+-- perdano a vicenda se calcolati lato client (leggi valore, scrivi valore+1).
+create or replace function increment_click_parola(id_parola uuid)
+returns void
+language sql
+as $$
+  update parole_chiave set contatore_click = contatore_click + 1 where id = id_parola;
+$$;
+
+grant execute on function increment_click_parola(uuid) to authenticated;
