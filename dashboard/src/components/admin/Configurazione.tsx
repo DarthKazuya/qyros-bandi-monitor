@@ -23,7 +23,7 @@ export function Configurazione() {
     setCaricamento(true);
     try {
       const [risultatoParole, risultatoImpostazioni, risultatoSuggerimenti] = await Promise.all([
-        supabase.from('parole_chiave').select('id, parola, livello').order('parola'),
+        supabase.from('parole_chiave').select('id, parola, livello, contatore_click').order('parola'),
         supabase.from('impostazioni_job').select('id, ora, fuso_orario').eq('id', 1).single(),
         supabase
           .from('suggerimenti_parole_chiave')
@@ -64,7 +64,7 @@ export function Configurazione() {
     const { data, error } = await supabase
       .from('parole_chiave')
       .insert({ parola: nuovaParola.trim(), livello: nuovoLivello })
-      .select('id, parola, livello')
+      .select('id, parola, livello, contatore_click')
       .single();
     if (error) {
       setErrore(error.message);
@@ -90,7 +90,7 @@ export function Configurazione() {
     const { data: nuovaParola, error: erroreInserimento } = await supabase
       .from('parole_chiave')
       .insert({ parola: suggerimento.parola, livello: 'livello2' })
-      .select('id, parola, livello')
+      .select('id, parola, livello, contatore_click')
       .single();
     if (erroreInserimento) {
       setErrore(erroreInserimento.message);
@@ -215,7 +215,7 @@ export function Configurazione() {
               .map((parola) => (
                 <Chip
                   key={parola.id}
-                  label={parola.parola}
+                  label={`${parola.parola} (${parola.contatore_click})`}
                   onDelete={() => rimuoviParola(parola)}
                   sx={{
                     minHeight: 44,

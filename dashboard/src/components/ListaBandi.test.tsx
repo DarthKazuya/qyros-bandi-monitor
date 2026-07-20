@@ -26,16 +26,26 @@ let datiFinti: Bando[] = [];
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          order: async () => ({ data: datiFinti, error: null }),
+    from: (tabella: string) => {
+      if (tabella === 'parole_chiave') {
+        return {
+          select: () => ({
+            order: async () => ({ data: [], error: null }),
+          }),
+        };
+      }
+      return {
+        select: () => ({
+          eq: () => ({
+            order: async () => ({ data: datiFinti, error: null }),
+          }),
         }),
-      }),
-      update: (valori: Partial<Bando>) => ({
-        eq: (colonna: string, valore: string) => aggiornaFinto(valori, colonna, valore),
-      }),
-    }),
+        update: (valori: Partial<Bando>) => ({
+          eq: (colonna: string, valore: string) => aggiornaFinto(valori, colonna, valore),
+        }),
+      };
+    },
+    rpc: vi.fn(async () => ({ data: null, error: null })),
   },
 }));
 

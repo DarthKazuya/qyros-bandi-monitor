@@ -47,6 +47,7 @@ export interface ParolaChiave {
   id: string;
   parola: string;
   livello: 'livello1' | 'livello2';
+  contatore_click: number;
 }
 
 export interface SuggerimentoParolaChiave {

@@ -73,8 +73,8 @@ describe('Configurazione', () => {
     aggiornaOraFinto.mockClear();
     aggiornaSuggerimentoFinto.mockClear();
     paroleFinte = [
-      { id: '1', parola: 'gaming', livello: 'livello1' },
-      { id: '2', parola: 'startup', livello: 'livello2' },
+      { id: '1', parola: 'gaming', livello: 'livello1', contatore_click: 12 },
+      { id: '2', parola: 'startup', livello: 'livello2', contatore_click: 0 },
     ];
     impostazioniFinte = { id: 1, ora: 8, fuso_orario: 'Europe/Rome' };
     suggerimentiFinti = [];
@@ -82,8 +82,8 @@ describe('Configurazione', () => {
 
   it('mostra le parole chiave raggruppate per livello', async () => {
     render(<Configurazione />);
-    await waitFor(() => expect(screen.getByText('gaming')).toBeInTheDocument());
-    expect(screen.getByText('startup')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('gaming (12)')).toBeInTheDocument());
+    expect(screen.getByText('startup (0)')).toBeInTheDocument();
   });
 
   it('mostra l\'ora attuale', async () => {
@@ -94,7 +94,7 @@ describe('Configurazione', () => {
   it('aggiunge una nuova parola chiave', async () => {
     const utente = userEvent.setup();
     render(<Configurazione />);
-    await waitFor(() => expect(screen.getByText('gaming')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('gaming (12)')).toBeInTheDocument());
 
     await utente.type(screen.getByLabelText('Nuova parola chiave'), 'fintech');
     await utente.click(screen.getByRole('button', { name: 'Aggiungi' }));
@@ -105,13 +105,20 @@ describe('Configurazione', () => {
   it('rimuove una parola chiave esistente', async () => {
     const utente = userEvent.setup();
     render(<Configurazione />);
-    await waitFor(() => expect(screen.getByText('gaming')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('gaming (12)')).toBeInTheDocument());
 
-    const chipGaming = screen.getByText('gaming').closest('.MuiChip-root') as HTMLElement;
+    const chipGaming = screen.getByText('gaming (12)').closest('.MuiChip-root') as HTMLElement;
     const pulsanteElimina = within(chipGaming).getByTestId('CancelIcon');
     await utente.click(pulsanteElimina);
 
     await waitFor(() => expect(eliminaFinto).toHaveBeenCalledWith('id', '1'));
+  });
+
+  it('mostra quante volte ogni parola chiave è stata usata come filtro', async () => {
+    render(<Configurazione />);
+    // MUI Chip rende `label` come un unico nodo di testo, quindi il conteggio
+    // non è isolabile da 'gaming': verifichiamo l'etichetta completa.
+    await waitFor(() => expect(screen.getByText('gaming (12)')).toBeInTheDocument());
   });
 
   it('salva la nuova ora', async () => {

@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { supabase } from '../lib/supabase';
-import type { Bando } from '../lib/types';
+import type { Bando, ParolaChiave } from '../lib/types';
 import { BandoCard } from './BandoCard';
 import { FiltriBar, type FiltriBarProps } from './FiltriBar';
 import { SuggerisciParolaChiave } from './SuggerisciParolaChiave';
@@ -23,10 +23,26 @@ export function ListaBandi() {
   const [caricamento, setCaricamento] = useState(true);
   const [errore, setErrore] = useState<string | null>(null);
   const [filtri, setFiltri] = useState<FiltriStato>(() => caricaFiltriSalvati() ?? FILTRI_DEFAULT);
+  const [paroleChiaveDisponibili, setParoleChiaveDisponibili] = useState<ParolaChiave[]>([]);
 
   useEffect(() => {
     caricaBandi();
+    caricaParoleChiave();
   }, []);
+
+  async function caricaParoleChiave() {
+    const { data, error } = await supabase
+      .from('parole_chiave')
+      .select('id, parola, livello, contatore_click')
+      .order('parola');
+    if (!error) {
+      setParoleChiaveDisponibili((data ?? []) as ParolaChiave[]);
+    }
+  }
+
+  async function incrementaContatoreParola(id: string) {
+    await supabase.rpc('increment_click_parola', { id_parola: id });
+  }
 
   async function caricaBandi() {
     setCaricamento(true);
@@ -83,7 +99,9 @@ export function ListaBandi() {
         filtri={filtri}
         fontiDisponibili={FONTI_ATTIVE}
         conteggiPriorita={conteggiPriorita}
+        paroleChiaveDisponibili={paroleChiaveDisponibili}
         onCambiaFiltri={onCambiaFiltri}
+        onParolaChiaveCliccata={incrementaContatoreParola}
       />
       <SuggerisciParolaChiave />
 

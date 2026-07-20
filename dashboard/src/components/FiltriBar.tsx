@@ -20,16 +20,25 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import type { FiltriStato } from '../lib/filtriBandi';
-import { PAROLE_CHIAVE } from '../lib/keywords';
+import type { ParolaChiave } from '../lib/types';
 
 export interface FiltriBarProps {
   filtri: FiltriStato;
   fontiDisponibili: string[];
   conteggiPriorita: { tutti: number; alta: number; da_verificare: number };
+  paroleChiaveDisponibili: ParolaChiave[];
   onCambiaFiltri: (filtri: FiltriStato) => void;
+  onParolaChiaveCliccata: (id: string) => void;
 }
 
-export function FiltriBar({ filtri, fontiDisponibili, conteggiPriorita, onCambiaFiltri }: FiltriBarProps) {
+export function FiltriBar({
+  filtri,
+  fontiDisponibili,
+  conteggiPriorita,
+  paroleChiaveDisponibili,
+  onCambiaFiltri,
+  onParolaChiaveCliccata,
+}: FiltriBarProps) {
   const [paroleChiaveAperte, setParoleChiaveAperte] = useState(false);
 
   function gestisciCambioFonti(evento: SelectChangeEvent<string[]>) {
@@ -162,13 +171,16 @@ export function FiltriBar({ filtri, fontiDisponibili, conteggiPriorita, onCambia
         </Box>
         <Collapse in={paroleChiaveAperte}>
           <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, pt: 1 }}>
-            {PAROLE_CHIAVE.map((parola) => (
+            {paroleChiaveDisponibili.map((parola) => (
               <Chip
-                key={parola}
-                label={parola}
+                key={parola.id}
+                label={parola.parola}
                 clickable
-                onClick={() => gestisciToggleParolaChiave(parola)}
-                color={filtri.paroleChiave.includes(parola) ? 'primary' : 'default'}
+                onClick={() => {
+                  gestisciToggleParolaChiave(parola.parola);
+                  onParolaChiaveCliccata(parola.id);
+                }}
+                color={filtri.paroleChiave.includes(parola.parola) ? 'primary' : 'default'}
                 sx={{ minHeight: 44 }}
               />
             ))}
