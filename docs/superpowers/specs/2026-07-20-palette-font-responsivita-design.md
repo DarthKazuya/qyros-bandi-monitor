@@ -43,7 +43,7 @@ semantici di MUI (non su chiavi custom), così ogni componente MUI esistente
 | `warning` | Badge "in scadenza" (bando con meno di 30 giorni alla scadenza) | valori predefiniti di MUI (ambra Material standard, non personalizzati) | valori predefiniti di MUI |
 | `background.default` | Sfondo pagina | `#f5f6f8` (invariato) | `#111318` (mai nero puro) |
 | `background.paper` | Sfondo card/superfici | `#ffffff` (invariato) | `#1a1d24` (leggermente più chiaro del canvas, per restare distinguibile) |
-| `text.primary` / `text.secondary` | Testo | invariati (derivati dal blu scuro precedente, restano leggibili sulla nuova palette) | adattati al nuovo sfondo `#111318` |
+| `text.primary` / `text.secondary` | Testo | `#040a1b` / `#52627a` (valori numerici invariati rispetto a oggi, ora scritti come letterali — non più derivati da `PALETTE_QYROS`, che viene rimossa) | `#f5f5f0` / `#93a4bd` (valori numerici invariati — già ad alto contrasto sul nuovo sfondo `#111318`, nessun adattamento necessario) |
 
 Regola d'inversione per `secondary`, `info` ed `error`: sfondo chiaro + testo
 scuro della stessa famiglia in tema chiaro; sfondo scuro + testo chiaro della
