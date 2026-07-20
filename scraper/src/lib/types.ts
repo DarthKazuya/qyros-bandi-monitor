@@ -13,6 +13,7 @@ export interface BandoRaw {
 export interface MatchResult {
   priorita: Priorita | null;
   scartato: boolean;
+  paroleTrovate: string[];
 }
 
 export interface Keywords {

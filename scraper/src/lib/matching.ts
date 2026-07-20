@@ -8,20 +8,22 @@ export function normalizzaTesto(testo: string): string {
     .replace(/[-\s]+/g, '');
 }
 
-function contieneKeyword(testoNormalizzato: string, keywords: string[]): boolean {
-  return keywords.some((keyword) => testoNormalizzato.includes(normalizzaTesto(keyword)));
+function keywordCorrispondenti(testoNormalizzato: string, keywords: string[]): string[] {
+  return keywords.filter((keyword) => testoNormalizzato.includes(normalizzaTesto(keyword)));
 }
 
 export function classifica(titolo: string, descrizione: string, keywords: Keywords): MatchResult {
   const testoNormalizzato = normalizzaTesto(`${titolo} ${descrizione}`);
 
-  if (contieneKeyword(testoNormalizzato, keywords.livello1)) {
-    return { priorita: 'alta', scartato: false };
+  const trovateLivello1 = keywordCorrispondenti(testoNormalizzato, keywords.livello1);
+  if (trovateLivello1.length > 0) {
+    return { priorita: 'alta', scartato: false, paroleTrovate: trovateLivello1 };
   }
 
-  if (contieneKeyword(testoNormalizzato, keywords.livello2)) {
-    return { priorita: 'da_verificare', scartato: false };
+  const trovateLivello2 = keywordCorrispondenti(testoNormalizzato, keywords.livello2);
+  if (trovateLivello2.length > 0) {
+    return { priorita: 'da_verificare', scartato: false, paroleTrovate: trovateLivello2 };
   }
 
-  return { priorita: null, scartato: true };
+  return { priorita: null, scartato: true, paroleTrovate: [] };
 }

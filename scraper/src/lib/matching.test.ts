@@ -9,7 +9,7 @@ const keywords: Keywords = {
 
 describe('normalizzaTesto', () => {
   it('rimuove accenti, minuscolizza e rimuove spazi/trattini', () => {
-    expect(normalizzaTesto('È un progetto di Économia Circolare!')).toBe('eunprogettodieconomiacircolare!');
+    expect(normalizzaTesto('È un progetto di Económia Circolare!')).toBe('eunprogettodieconomiacircolare!');
   });
 
   it('rende equivalenti start-up, start up e startup', () => {
@@ -21,7 +21,7 @@ describe('normalizzaTesto', () => {
 describe('classifica', () => {
   it('assegna priorita alta se trova una keyword di livello 1', () => {
     const risultato = classifica('Bando per il settore gaming', 'Descrizione generica', keywords);
-    expect(risultato).toEqual({ priorita: 'alta', scartato: false });
+    expect(risultato).toEqual({ priorita: 'alta', scartato: false, paroleTrovate: ['gaming'] });
   });
 
   it('riconosce le keyword di livello 1 case-insensitive', () => {
@@ -31,12 +31,12 @@ describe('classifica', () => {
 
   it('riconosce varianti con trattino/spazio (start-up)', () => {
     const risultato = classifica('Bando per le start-up innovative', '', keywords);
-    expect(risultato).toEqual({ priorita: 'da_verificare', scartato: false });
+    expect(risultato).toEqual({ priorita: 'da_verificare', scartato: false, paroleTrovate: ['startup', 'start-up'] });
   });
 
   it('assegna da_verificare se trova solo keyword di livello 2', () => {
     const risultato = classifica('Bando sulla tecnologia', 'Progetto di innovazione', keywords);
-    expect(risultato).toEqual({ priorita: 'da_verificare', scartato: false });
+    expect(risultato).toEqual({ priorita: 'da_verificare', scartato: false, paroleTrovate: ['tecnologia', 'innovazione'] });
   });
 
   it('riconosce keyword in inglese', () => {
@@ -46,11 +46,21 @@ describe('classifica', () => {
 
   it('scarta se non trova nessuna keyword', () => {
     const risultato = classifica('Bando per la ristrutturazione edilizia', 'Contributi per facciate', keywords);
-    expect(risultato).toEqual({ priorita: null, scartato: true });
+    expect(risultato).toEqual({ priorita: null, scartato: true, paroleTrovate: [] });
   });
 
   it('da priorita alta anche se e presente anche una keyword di livello 2', () => {
     const risultato = classifica('Bando fintech e innovazione', '', keywords);
     expect(risultato.priorita).toBe('alta');
+  });
+
+  it('elenca tutte le parole di livello 1 trovate, non solo la prima', () => {
+    const risultato = classifica('Bando fintech per il gaming', '', keywords);
+    expect(risultato.paroleTrovate).toEqual(['gaming', 'fintech']);
+  });
+
+  it('non elenca parole di livello 2 quando ne ha gia trovata una di livello 1', () => {
+    const risultato = classifica('Bando fintech e innovazione', '', keywords);
+    expect(risultato.paroleTrovate).toEqual(['fintech']);
   });
 });
