@@ -1,4 +1,4 @@
-import { createTheme, type Theme } from '@mui/material/styles';
+import { createTheme, type Theme, type Shadows } from '@mui/material/styles';
 
 declare module '@mui/material/styles' {
   interface PaletteColor {
@@ -9,6 +9,20 @@ declare module '@mui/material/styles' {
     container?: string;
     onContainer?: string;
   }
+}
+
+function creaOmbreM3(): Shadows {
+  const ombre: string[] = ['none'];
+  for (let livello = 1; livello <= 24; livello++) {
+    const offsetY = Math.min(1 + livello, 16);
+    const blur = Math.min(4 + livello * 2, 48);
+    const opacita = Math.max(0.16 - livello * 0.004, 0.08).toFixed(2);
+    ombre.push(`0px ${offsetY}px ${blur}px rgba(15,20,30,${opacita})`);
+  }
+  // MUI richiede una tupla di esattamente 25 stringhe (Shadows); costruirla
+  // via loop è più leggibile di 25 righe letterali, ma non è verificabile
+  // otticamente da TypeScript come tupla a lunghezza fissa.
+  return ombre as unknown as Shadows;
 }
 
 export function creaTemaQyros(modalita: 'light' | 'dark'): Theme {
@@ -46,18 +60,14 @@ export function creaTemaQyros(modalita: 'light' | 'dark'): Theme {
         secondary: scuro ? '#93a4bd' : '#52627a',
       },
     },
-    shape: { borderRadius: 16 },
+    shape: { borderRadius: 12 },
+    shadows: creaOmbreM3(),
     typography: {
       fontFamily: '"Roboto", "Segoe UI", -apple-system, sans-serif',
       h5: { fontWeight: 800 },
       h6: { fontWeight: 700 },
     },
     components: {
-      MuiCard: {
-        styleOverrides: {
-          root: { borderRadius: 16 },
-        },
-      },
       MuiButton: {
         styleOverrides: {
           root: { textTransform: 'none', borderRadius: 12 },

@@ -58,4 +58,16 @@ describe('creaTemaQyros', () => {
     expect(creaTemaQyros('dark').palette.mode).toBe('dark');
     expect(creaTemaQyros('light').palette.mode).toBe('light');
   });
+
+  it('usa un raggio degli angoli di 12px (token di forma Material 3)', () => {
+    expect(creaTemaQyros('light').shape.borderRadius).toBe(12);
+  });
+
+  it('genera 25 livelli di ombra, più tenui del default MUI', () => {
+    const ombre = creaTemaQyros('light').shadows;
+    expect(ombre).toHaveLength(25);
+    expect(ombre[0]).toBe('none');
+    expect(ombre[1]).toBe('0px 2px 6px rgba(15,20,30,0.16)');
+    expect(ombre[24]).toBe('0px 16px 48px rgba(15,20,30,0.08)');
+  });
 });
