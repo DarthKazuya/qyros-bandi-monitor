@@ -15,24 +15,51 @@ describe('UtentiAutorizzati', () => {
     chiamaAdminActionsFinta.mockReset();
   });
 
-  it('mostra l\'elenco utenti', async () => {
+  it('mostra nome e cognome come testo principale, email come sottotitolo', async () => {
+    chiamaAdminActionsFinta.mockResolvedValueOnce({
+      utenti: [{ id: '2', email: 'mario.rossi@esempio.it', nome: 'Mario', cognome: 'Rossi' }],
+    });
+    render(<UtentiAutorizzati />);
+    await waitFor(() => expect(screen.getByText('Mario Rossi')).toBeInTheDocument());
+    expect(screen.getByText('mario.rossi@esempio.it')).toBeInTheDocument();
+  });
+
+  it('mostra solo l\'email quando nome/cognome non sono disponibili', async () => {
+    chiamaAdminActionsFinta.mockResolvedValueOnce({
+      utenti: [{ id: '2', email: 'mario.rossi@esempio.it' }],
+    });
+    render(<UtentiAutorizzati />);
+    await waitFor(() => expect(screen.getByText('mario.rossi@esempio.it')).toBeInTheDocument());
+  });
+
+  it('mostra l\'amministratore con "(ADMIN)" dopo il nome', async () => {
+    chiamaAdminActionsFinta.mockResolvedValueOnce({
+      utenti: [{ id: '1', email: 'panto75@gmail.com', nome: 'Luca', cognome: 'Panto' }],
+    });
+    render(<UtentiAutorizzati />);
+    await waitFor(() => expect(screen.getByText('Luca Panto (ADMIN)')).toBeInTheDocument());
+    expect(screen.getByText('panto75@gmail.com')).toBeInTheDocument();
+  });
+
+  it('ordina sempre l\'amministratore per primo, indipendentemente dall\'ordine ricevuto', async () => {
     chiamaAdminActionsFinta.mockResolvedValueOnce({
       utenti: [
-        { id: '1', email: 'panto75@gmail.com' },
-        { id: '2', email: 'mario.rossi@esempio.it' },
+        { id: '2', email: 'mario.rossi@esempio.it', nome: 'Mario', cognome: 'Rossi' },
+        { id: '1', email: 'panto75@gmail.com', nome: 'Luca', cognome: 'Panto' },
       ],
     });
     render(<UtentiAutorizzati />);
-    await waitFor(() => expect(screen.getByText('panto75@gmail.com')).toBeInTheDocument());
-    expect(screen.getByText('mario.rossi@esempio.it')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Luca Panto (ADMIN)')).toBeInTheDocument());
+    const testi = screen.getAllByText(/Panto|Rossi/).map((el) => el.textContent);
+    expect(testi[0]).toContain('Luca Panto');
   });
 
   it('non mostra il pulsante Revoca per l\'amministratore stesso', async () => {
     chiamaAdminActionsFinta.mockResolvedValueOnce({
-      utenti: [{ id: '1', email: 'panto75@gmail.com' }],
+      utenti: [{ id: '1', email: 'panto75@gmail.com', nome: 'Luca', cognome: 'Panto' }],
     });
     render(<UtentiAutorizzati />);
-    await waitFor(() => expect(screen.getByText('panto75@gmail.com')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('Luca Panto (ADMIN)')).toBeInTheDocument());
     expect(screen.queryByRole('button', { name: 'Revoca' })).not.toBeInTheDocument();
   });
 

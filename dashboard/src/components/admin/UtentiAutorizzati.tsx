@@ -3,6 +3,14 @@ import { Alert, Box, Button, CircularProgress, Stack, Typography } from '@mui/ma
 import { chiamaAdminActions, EMAIL_AMMINISTRATORE } from '../../lib/admin';
 import type { UtenteAutorizzato } from '../../lib/types';
 
+function ordinaAmministratorePerPrimo(utenti: UtenteAutorizzato[]): UtenteAutorizzato[] {
+  return [...utenti].sort((a, b) => {
+    if (a.email === EMAIL_AMMINISTRATORE) return -1;
+    if (b.email === EMAIL_AMMINISTRATORE) return 1;
+    return 0;
+  });
+}
+
 export function UtentiAutorizzati() {
   const [utenti, setUtenti] = useState<UtenteAutorizzato[]>([]);
   const [caricamento, setCaricamento] = useState(true);
@@ -56,34 +64,47 @@ export function UtentiAutorizzati() {
         <Typography color="text.secondary">Nessun utente autorizzato.</Typography>
       ) : (
         <Stack spacing={1.5}>
-          {utenti.map((utente) => (
-            <Box
-              key={utente.id}
-              sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                p: 2,
-                border: '1px solid',
-                borderColor: 'divider',
-                borderRadius: 2,
-              }}
-            >
-              <Typography>{utente.email}</Typography>
-              {utente.email !== EMAIL_AMMINISTRATORE && (
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  size="small"
-                  disabled={azioneInCorso === utente.id}
-                  onClick={() => revoca(utente)}
-                  sx={{ minHeight: 44 }}
-                >
-                  Revoca
-                </Button>
-              )}
-            </Box>
-          ))}
+          {ordinaAmministratorePerPrimo(utenti).map((utente) => {
+            const nomeCompleto = utente.nome && utente.cognome ? `${utente.nome} ${utente.cognome}` : null;
+            const eAmministratore = utente.email === EMAIL_AMMINISTRATORE;
+            const testoPrincipale = (nomeCompleto ?? utente.email) + (eAmministratore ? ' (ADMIN)' : '');
+
+            return (
+              <Box
+                key={utente.id}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  p: 2,
+                  border: '1px solid',
+                  borderColor: 'divider',
+                  borderRadius: 2,
+                }}
+              >
+                <Box>
+                  <Typography>{testoPrincipale}</Typography>
+                  {nomeCompleto && (
+                    <Typography variant="body2" color="text.secondary">
+                      {utente.email}
+                    </Typography>
+                  )}
+                </Box>
+                {!eAmministratore && (
+                  <Button
+                    variant="outlined"
+                    color="secondary"
+                    size="small"
+                    disabled={azioneInCorso === utente.id}
+                    onClick={() => revoca(utente)}
+                    sx={{ minHeight: 44 }}
+                  >
+                    Revoca
+                  </Button>
+                )}
+              </Box>
+            );
+          })}
         </Stack>
       )}
     </Box>
