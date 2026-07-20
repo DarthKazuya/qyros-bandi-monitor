@@ -39,8 +39,8 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
               label={`Corrisponde a: ${bando.parole_corrispondenti.join(', ')}`}
               size="small"
               sx={{
-                bgcolor: eAlta ? 'primary.main' : 'secondary.main',
-                color: '#ffffff',
+                bgcolor: eAlta ? 'secondary.container' : 'info.container',
+                color: eAlta ? 'secondary.onContainer' : 'info.onContainer',
                 fontWeight: 600,
               }}
             />
@@ -70,7 +70,7 @@ export function BandoCard({ bando, onCambiaStato }: BandoCardProps) {
             size="small"
             sx={{
               mt: 1,
-              bgcolor: eInAllarme ? 'error.main' : 'action.selected',
+              bgcolor: eInAllarme ? 'warning.main' : 'action.selected',
               color: eInAllarme ? '#ffffff' : 'text.primary',
             }}
           />

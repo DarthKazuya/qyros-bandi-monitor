@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ThemeProvider } from '@mui/material/styles';
 import { BandoCard } from './BandoCard';
+import { creaTemaQyros } from '../theme';
 import type { Bando } from '../lib/types';
 
 function dataLocaleISO(data: Date): string {
@@ -109,5 +111,37 @@ describe('BandoCard', () => {
     render(<BandoCard bando={creaBando({ scadenza: null })} onCambiaStato={vi.fn()} />);
     expect(screen.queryByText(/alla scadenza/i)).not.toBeInTheDocument();
     expect(screen.queryByText('Scaduto')).not.toBeInTheDocument();
+  });
+
+  it('usa il tono container teal per i bandi ad alta priorità', () => {
+    render(
+      <ThemeProvider theme={creaTemaQyros('light')}>
+        <BandoCard bando={creaBando({ priorita: 'alta', parole_corrispondenti: ['fintech'] })} onCambiaStato={vi.fn()} />
+      </ThemeProvider>
+    );
+    const chip = screen.getByText('Corrisponde a: fintech').closest('.MuiChip-root');
+    expect(chip).toHaveStyle({ backgroundColor: 'rgb(210, 239, 240)' });
+  });
+
+  it('usa il tono container grigio-blu per i bandi da verificare', () => {
+    render(
+      <ThemeProvider theme={creaTemaQyros('light')}>
+        <BandoCard bando={creaBando({ priorita: 'da_verificare', parole_corrispondenti: ['tech'] })} onCambiaStato={vi.fn()} />
+      </ThemeProvider>
+    );
+    const chip = screen.getByText('Corrisponde a: tech').closest('.MuiChip-root');
+    expect(chip).toHaveStyle({ backgroundColor: 'rgb(236, 239, 241)' });
+  });
+
+  it('usa il colore di avviso, non di errore, per un bando in scadenza', () => {
+    const tra20Giorni = new Date();
+    tra20Giorni.setDate(tra20Giorni.getDate() + 20);
+    render(
+      <ThemeProvider theme={creaTemaQyros('light')}>
+        <BandoCard bando={creaBando({ scadenza: dataLocaleISO(tra20Giorni) })} onCambiaStato={vi.fn()} />
+      </ThemeProvider>
+    );
+    const chip = screen.getByText('20 giorni alla scadenza').closest('.MuiChip-root');
+    expect(chip).toHaveStyle({ backgroundColor: 'rgb(237, 108, 2)' });
   });
 });
