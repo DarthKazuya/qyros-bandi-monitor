@@ -100,8 +100,8 @@ export function FiltriBar({
         </ToggleButton>
       </ToggleButtonGroup>
 
-      <Box sx={{ display: 'flex', gap: 1.5, flexWrap: 'wrap' }}>
-        <FormControl size="small" sx={{ minWidth: 200, flex: 1 }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 1.5, flexWrap: 'wrap' }}>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 200 }, flex: 1 }}>
           <InputLabel id="filtro-fonte-label">Fonte</InputLabel>
           <Select
             labelId="filtro-fonte-label"
@@ -120,7 +120,7 @@ export function FiltriBar({
           </Select>
         </FormControl>
 
-        <FormControl size="small" sx={{ minWidth: 180, flex: 1 }}>
+        <FormControl size="small" sx={{ minWidth: { xs: '100%', sm: 180 }, flex: 1 }}>
           <InputLabel id="ordinamento-label">Ordina per</InputLabel>
           <Select
             labelId="ordinamento-label"
@@ -138,7 +138,7 @@ export function FiltriBar({
         <IconButton
           onClick={gestisciInversioneDirezione}
           aria-label="Inverti direzione ordinamento"
-          sx={{ minWidth: 44, minHeight: 44 }}
+          sx={{ minWidth: 44, minHeight: 44, alignSelf: { xs: 'flex-end', sm: 'center' } }}
         >
           {filtri.direzioneOrdinamento === 'crescente' ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
         </IconButton>
