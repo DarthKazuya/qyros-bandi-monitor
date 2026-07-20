@@ -50,7 +50,12 @@ export function RichiesteInAttesa() {
     setErrore(null);
     setAzioneInCorso(richiesta.id);
     try {
-      await chiamaAdminActions('approva_richiesta', { id: richiesta.id, email: richiesta.email });
+      await chiamaAdminActions('approva_richiesta', {
+        id: richiesta.id,
+        email: richiesta.email,
+        nome: richiesta.nome,
+        cognome: richiesta.cognome,
+      });
       setRichieste((precedenti) => precedenti.filter((r) => r.id !== richiesta.id));
     } catch (err) {
       setErrore(err instanceof Error ? err.message : 'Errore sconosciuto');

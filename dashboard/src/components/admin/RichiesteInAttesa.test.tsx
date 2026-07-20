@@ -80,6 +80,8 @@ describe('RichiesteInAttesa', () => {
       expect(chiamaAdminActionsFinta).toHaveBeenCalledWith('approva_richiesta', {
         id: '1',
         email: 'mario.rossi@esempio.it',
+        nome: 'Mario',
+        cognome: 'Rossi',
       })
     );
     await waitFor(() => expect(screen.queryByText('Mario Rossi')).not.toBeInTheDocument());

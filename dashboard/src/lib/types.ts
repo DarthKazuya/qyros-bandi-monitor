@@ -25,6 +25,8 @@ export interface RichiestaAccesso {
 export interface UtenteAutorizzato {
   id: string;
   email: string;
+  nome?: string;
+  cognome?: string;
 }
 
 export interface FonteFallitaLog {

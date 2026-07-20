@@ -56,18 +56,24 @@ Deno.serve(async (richiesta: Request) => {
     if (error) {
       return risposta({ errore: error.message }, 500);
     }
-    const utenti = data.users.map((u) => ({ id: u.id, email: u.email }));
+    const utenti = data.users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      nome: u.user_metadata?.nome as string | undefined,
+      cognome: u.user_metadata?.cognome as string | undefined,
+    }));
     return risposta({ utenti }, 200);
   }
 
   if (corpo.azione === 'approva_richiesta') {
-    const { id, email: emailRichiedente } = corpo;
+    const { id, email: emailRichiedente, nome, cognome } = corpo;
     if (!id || !emailRichiedente) {
       return risposta({ errore: 'id ed email sono obbligatori' }, 400);
     }
 
     const { error: erroreCreazione } = await client.auth.admin.inviteUserByEmail(emailRichiedente, {
       redirectTo: URL_DASHBOARD,
+      data: { nome, cognome },
     });
     if (erroreCreazione) {
       return risposta({ errore: erroreCreazione.message }, 500);

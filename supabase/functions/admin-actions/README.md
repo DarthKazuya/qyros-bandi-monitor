@@ -10,10 +10,15 @@ resta sempre lato server, dentro questa funzione.
 Richiesta `POST` con intestazione `Authorization: Bearer <token della sessione>` e
 corpo JSON `{ "azione": "...", ... }`:
 
-- `elenco_utenti` — nessun parametro aggiuntivo. Restituisce `{ utenti: [...] }`.
-- `approva_richiesta` — richiede `id` (id della riga in `richieste_accesso`) ed
-  `email`. Crea l'utente Supabase Auth, gli invia l'email di invito con il link
-  di accesso (`inviteUserByEmail`) e marca la richiesta come approvata.
+- `elenco_utenti` — nessun parametro aggiuntivo. Restituisce
+  `{ utenti: [{ id, email, nome?, cognome? }] }` — `nome`/`cognome` provengono
+  da `user_metadata` e sono assenti per utenti creati prima che questo campo
+  esistesse.
+- `approva_richiesta` — richiede `id` (id della riga in `richieste_accesso`),
+  `email`, e opzionalmente `nome`/`cognome` (salvati in `user_metadata`
+  dell'utente Supabase Auth creato). Crea l'utente, gli invia l'email di
+  invito con il link di accesso (`inviteUserByEmail`) e marca la richiesta
+  come approvata.
 - `revoca_utente` — richiede `id` (id dell'utente Supabase Auth). Elimina l'utente.
 
 Ogni richiesta viene rifiutata con `403` se il token non corrisponde all'email
