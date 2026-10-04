@@ -1,2 +1,5 @@
 .worktrees/
 .DS_Store
+.claude/
+supabase/.temp/
+supabase-audit.md
